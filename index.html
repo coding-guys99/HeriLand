@@ -10,21 +10,18 @@
 <body class="mobile-app">
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <!-- AppBar（左 Logo、右通知，中間搜尋觸發膠囊） -->
-  <header class="appbar" role="banner">
-    <div class="appbar-inner">
-      <a class="brand" href="index.html" aria-label="HeriLand">
-        <img src="assets/logo.svg" alt="" class="brand-mark"/>
-      </a>
-
-      <!-- 🔍 搜尋膠囊：含真正的輸入框 -->
-<div class="search-pill" id="searchPill">
-  🔍 <input id="searchField" type="search" placeholder="Search: seafood, museum, beach…" autocomplete="off"/>
-</div>
-
-      <button class="icon-btn" aria-label="Notifications">🔔</button>
+  <!-- AppBar（左 Hello，右搜尋 icon） -->
+<header class="appbar" role="banner">
+  <div class="appbar-inner">
+    <div class="greet">
+      <strong>Hello</strong>
+      <span class="sub">Explore Sarawak</span>
     </div>
-  </header>
+    <button id="btnSearch" class="icon-btn search-trigger" aria-label="Search">
+      🔍
+    </button>
+  </div>
+</header>
 
   <main id="main">
     <!-- Hero Rail -->
@@ -43,12 +40,23 @@
     <section class="rows" id="rowsHost"></section>
   </main>
 
-  <!-- ===== Fullscreen Glass Search（整頁） ===== -->
-  <div id="searchOverlay" class="overlay-glass" hidden>
-    <!-- 由 JS 控制 .active / hidden -->
-    <div id="overlayResults" class="overlay-results" role="list"></div>
-    <button id="overlayClose" class="overlay-close" type="button">Cancel</button>
+ <!-- 全螢幕玻璃搜尋（抖音式） -->
+<div id="searchOverlay" class="overlay-glass" hidden>
+  <div class="search-bar">
+    <div class="search-input">
+      🔍
+      <input id="overlayInput" type="search"
+             placeholder="Search: seafood, museum, beach…"
+             autocomplete="off" />
+    </div>
+    <button id="overlayClose" class="search-cancel" aria-label="Close">Cancel</button>
   </div>
+
+  <div class="search-scroll">
+    <div id="searchHint" class="search-hint">Popular: seafood · museum · beach</div>
+    <div id="overlayList" class="search-list" role="list"></div>
+  </div>
+</div>
 
   <!-- Modal（Place Detail） -->
   <div class="modal-backdrop" id="placeModal" hidden aria-hidden="true">
