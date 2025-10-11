@@ -735,7 +735,7 @@ body.searching #searchPill{ position: relative; z-index: 1300; }
 /* 搜尋中：把原本的搜尋膠囊固定在畫面上層 */
 body.searching #searchPill{
   position: fixed;
-  z-index: 1301;
+  z-index: 1500;
   left: var(--pill-left, 12px);
   top:  var(--pill-top,  12px);
   width: var(--pill-width, calc(100vw - 24px));
