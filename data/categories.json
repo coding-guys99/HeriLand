@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "categories": [
+    { "id": "taste",   "name_en": "Taste",   "icon": "🍜" },
+    { "id": "stay",    "name_en": "Stay",    "icon": "🛏️" },
+    { "id": "culture", "name_en": "Culture", "icon": "🏛️" },
+    { "id": "nature",  "name_en": "Nature",  "icon": "🌿" },
+    { "id": "event",   "name_en": "Events",  "icon": "🎉" }
+  ]
+}

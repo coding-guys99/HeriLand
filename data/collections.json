@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "1.0.0",
+  "rows": [
+    {
+      "id": "hero",
+      "type": "hero-rail",
+      "items": [
+        { "title": "Sarawak Seafood Week", "image": "assets/banners/seafood.jpg", "url": "/pages/places.html#?tags=seafood", "sponsored": false },
+        { "title": "Stay in a Cultural Lodge", "image": "assets/banners/stay.jpg", "url": "/pages/places.html#?tags=stay", "sponsored": true },
+        { "title": "Museums Highlights", "image": "assets/banners/museum.jpg", "url": "/pages/places.html#?tags=museum", "sponsored": false }
+      ]
+    },
+    {
+      "id": "top-picks",
+      "type": "poster-row",
+      "title": "Top Picks",
+      "source": { "filter": { "featured": true }, "limit": 10 }
+    },
+    {
+      "id": "recent",
+      "type": "mini-row",
+      "title": "Recently Updated",
+      "source": { "sort": "updatedAt:desc", "limit": 12 }
+    },
+    {
+      "id": "by-division",
+      "type": "division-row",
+      "title": "Explore by Division"
+    },
+    {
+      "id": "theme-seafood",
+      "type": "poster-row",
+      "title": "Seafood Lover",
+      "source": { "tags": ["seafood"], "limit": 12 }
+    },
+    {
+      "id": "theme-museum",
+      "type": "poster-row",
+      "title": "Museums",
+      "source": { "tags": ["museum"], "limit": 12 }
+    }
+  ],
+  "updatedAt": "2025-10-10T10:00:00.000Z"
+}

@@ -1,0 +1,28 @@
+[
+  {
+    "id": "kch01",
+    "name": "The White Cat Café",
+    "category": "Cafe",
+    "tags": ["coffee","heritage"],
+    "cover": "assets/places/kuching/whitecat.jpg",
+    "lat": 1.5589,
+    "lng": 110.3449,
+    "address": "Jalan Main Bazaar, Kuching",
+    "opening_hours": "Mon–Sun 09:00–21:00",
+    "highlights": "Riverside brews with heritage lane vibes.",
+    "website": "https://example.com",
+    "whatsapp": "60123456789"
+  },
+  {
+    "id": "kch02",
+    "name": "Sarawak Museum",
+    "category": "Museum",
+    "tags": ["history","family"],
+    "cover": "assets/places/kuching/museum.jpg",
+    "lat": 1.5581,
+    "lng": 110.3432,
+    "address": "Jalan Tun Abang Haji Openg",
+    "opening_hours": "Tue–Sun 10:00–17:00",
+    "highlights": "Borneo culture and natural history under one roof."
+  }
+]

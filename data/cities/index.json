@@ -1,0 +1,74 @@
+[
+  {
+    "slug": "kuching",
+    "name": { "en": "Kuching", "zh-TW": "古晋", "zh-CN": "古晋" },
+    "cover": "assets/img/cities/kuching.jpg",
+    "slogan": "Where the cat city meets the river breeze"
+  },
+  {
+    "slug": "samarahan",
+    "name": { "en": "Samarahan", "zh-TW": "三马拉汉", "zh-CN": "三马拉汉" },
+    "cover": "assets/img/cities/samarahan.jpg",
+    "slogan": "Education hub and rising township"
+  },
+  {
+    "slug": "serian",
+    "name": { "en": "Serian", "zh-TW": "西连", "zh-CN": "西连" },
+    "cover": "assets/img/cities/serian.jpg",
+    "slogan": "Gateway to the Borneo Highlands"
+  },
+  {
+    "slug": "sri-aman",
+    "name": { "en": "Sri Aman", "zh-TW": "斯里阿曼", "zh-CN": "斯里阿曼" },
+    "cover": "assets/img/cities/sri-aman.jpg",
+    "slogan": "The land of peace and heritage"
+  },
+  {
+    "slug": "betong",
+    "name": { "en": "Betong", "zh-TW": "木中", "zh-CN": "木中" },
+    "cover": "assets/img/cities/betong.jpg",
+    "slogan": "Quiet town with rich Iban culture"
+  },
+  {
+    "slug": "sarikei",
+    "name": { "en": "Sarikei", "zh-TW": "泗里街", "zh-CN": "泗里街" },
+    "cover": "assets/img/cities/sarikei.jpg",
+    "slogan": "Pineapple capital of Sarawak"
+  },
+  {
+    "slug": "sibu",
+    "name": { "en": "Sibu", "zh-TW": "诗巫", "zh-CN": "诗巫" },
+    "cover": "assets/img/cities/sibu.jpg",
+    "slogan": "Heart of commerce along the Rajang"
+  },
+  {
+    "slug": "mukah",
+    "name": { "en": "Mukah", "zh-TW": "木胶", "zh-CN": "木胶" },
+    "cover": "assets/img/cities/mukah.jpg",
+    "slogan": "Melanau coastal charm"
+  },
+  {
+    "slug": "bintulu",
+    "name": { "en": "Bintulu", "zh-TW": "民都鲁", "zh-CN": "民都鲁" },
+    "cover": "assets/img/cities/bintulu.jpg",
+    "slogan": "Energy town by the sea"
+  },
+  {
+    "slug": "kapit",
+    "name": { "en": "Kapit", "zh-TW": "加帛", "zh-CN": "加帛" },
+    "cover": "assets/img/cities/kapit.jpg",
+    "slogan": "Where the Rajang river runs deep"
+  },
+  {
+    "slug": "miri",
+    "name": { "en": "Miri", "zh-TW": "美里", "zh-CN": "美里" },
+    "cover": "assets/img/cities/miri.jpg",
+    "slogan": "Resort city of northern Sarawak"
+  },
+  {
+    "slug": "limbang",
+    "name": { "en": "Limbang", "zh-TW": "林梦", "zh-CN": "林梦" },
+    "cover": "assets/img/cities/limbang.jpg",
+    "slogan": "Border town of friendly smiles"
+  }
+]

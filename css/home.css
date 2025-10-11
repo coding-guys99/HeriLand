@@ -1,0 +1,57 @@
+/* Hero */
+.hero{padding:38px 0 18px}
+.hero__title{font-size:clamp(26px,6vw,40px);font-weight:900;letter-spacing:.3px}
+.hero__subtitle{margin-top:6px;color:var(--hl-muted)}
+
+/* 入口 2×2 */
+.entry{margin:12px auto 16px}
+.entry-grid{
+  display:grid;gap:var(--gap);
+  grid-template-columns:repeat(2,1fr);
+}
+.entry-card{
+  position:relative;min-height:120px;border-radius:var(--radius);
+  padding:16px;border:1px solid var(--hl-line);color:#0b0f0c;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  overflow:hidden;isolation:isolate;
+}
+.entry-card::before{
+  content:"";position:absolute;inset:0;opacity:.95;z-index:-1;
+  background:var(--g-explore);
+}
+.entry--explore::before{background:var(--g-explore)}
+.entry--taste::before{background:var(--g-taste)}
+.entry--experience::before{background:var(--g-experience)}
+.entry--culture::before{background:var(--g-culture)}
+.entry__title{font-weight:900;font-size:1.3rem}
+.entry__hint{opacity:.9;font-weight:700}
+
+/* 分隔小標 */
+.divider{margin:16px auto 10px;color:var(--hl-muted)}
+
+/* 城市牆 4×3 */
+.city-wall-wrap{padding:6px 0 10px}
+.city-wall{
+  display:grid;gap:var(--gap);
+  grid-template-columns:repeat(4,1fr);
+  grid-auto-rows:minmax(80px,1fr);
+}
+.city-tile{
+  position:relative;border:1px solid var(--hl-line);
+  border-radius:var(--radius);overflow:hidden;cursor:pointer;
+  display:flex;align-items:flex-end;min-height:80px;
+}
+.city-tile::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(0,0,0,.05),rgba(0,0,0,.24));
+  pointer-events:none;
+}
+.city-label{color:#fff;font-weight:900;text-shadow:0 2px 10px rgba(0,0,0,.6);
+  padding:12px;font-size:clamp(.95rem,2.5vw,1.05rem)}
+.city-error{margin-top:10px;color:#ffb4a2}
+
+/* RWD：手機寬度時維持 4×3 一頁看完（高度交給內容自適應） */
+@media (max-width:480px){
+  .entry-card{min-height:100px}
+  .city-wall{gap:10px}
+}

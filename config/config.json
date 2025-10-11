@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0.0",
+  "appName": "HeriLand",
+  "primaryLang": "en",
+  "features": {
+    "submitForm": false,
+    "mapView": false,
+    "events": false,
+    "blog": false
+  },
+  "links": {
+    "submitFormUrl": "",
+    "instagram": "",
+    "facebook": ""
+  },
+  "theme": {
+    "light": {
+      "bg": "#FAF6EF",
+      "card": "#FFFFFF",
+      "text": "#1A1A1A",
+      "muted": "rgba(0,0,0,.55)",
+      "accent": "#2E5E4E",
+      "gold": "#E4C77D"
+    }
+  }
+}

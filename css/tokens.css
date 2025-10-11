@@ -1,0 +1,23 @@
+:root{
+  /* 色票（深綠森系） */
+  --hl-bg:#0b1110;
+  --hl-surface:#111916;
+  --hl-ink:#e9f0ec;
+  --hl-muted:#9fb3ab;
+  --hl-line:rgba(235,210,140,.28);
+
+  /* 重點漸層（入口卡） */
+  --g-explore:linear-gradient(135deg,#8fd3f4,#84fab0);
+  --g-taste:linear-gradient(135deg,#ff9966,#ff5e62);
+  --g-experience:linear-gradient(135deg,#a18cd1,#fbc2eb);
+  --g-culture:linear-gradient(135deg,#f6d365,#fda085);
+
+  /* 城市磚色盤（12色） */
+  --c1:#00695C; --c2:#00796B; --c3:#0288D1; --c4:#303F9F;
+  --c5:#512DA8; --c6:#5D4037; --c7:#455A64; --c8:#2E7D32;
+  --c9:#C2185B; --c10:#7B1FA2; --c11:#1976D2; --c12:#0097A7;
+
+  --radius:16px;
+  --container:1040px;
+  --gap:12px;
+}

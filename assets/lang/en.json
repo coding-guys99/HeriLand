@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0.0",
+  "app": {
+    "name": "HeriLand",
+    "tagline": "Discover Sarawak — culture, food, and nature"
+  },
+  "nav": {
+    "explore": "Explore",
+    "favorites": "Favorites",
+    "about": "About",
+    "contact": "Contact",
+    "settings": "Settings"
+  },
+  "home": {
+    "hero.title": "Explore Sarawak like a local",
+    "hero.subtitle": "12 divisions · curated picks · bilingual tips",
+    "cta.submit": "Submit a new place",
+    "blocks.exploreByDivision": "Explore by Division",
+    "blocks.topPicks": "Top Picks",
+    "blocks.themes": "Themes"
+  },
+  "themes": {
+    "taste": "Taste",
+    "stay": "Stay",
+    "culture": "Culture",
+    "nature": "Nature",
+    "event": "Events"
+  },
+  "place": {
+    "open": "Open",
+    "closed": "Closed",
+    "hours": "Hours",
+    "address": "Address",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "website": "Website",
+    "map": "Map",
+    "share": "Share",
+    "favorite": "Favorite",
+    "addedToFavorites": "Added to Favorites",
+    "removedFromFavorites": "Removed from Favorites"
+  },
+  "empty": {
+    "noResults": "No results yet.",
+    "favorites": "No favorites yet."
+  }
+}

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Place — HeriLand</title>
+  <link rel="icon" href="assets/icons/favicon.png"/>
+
+  <!-- styles -->
+  <link rel="stylesheet" href="./css/tokens.css"/>
+  <link rel="stylesheet" href="./css/base.css"/>
+  <link rel="stylesheet" href="./css/components.css"/>
+
+  <!-- Leaflet 地圖（CDN） -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <style>
+    main{padding:32px 20px 80px}
+    .hero{display:grid; grid-template-columns: 1.4fr 1fr; gap:var(--gap); margin-bottom:24px}
+    .gallery{background:var(--hl-surface); border:1px solid var(--hl-border); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-1)}
+    .gallery img{width:100%; aspect-ratio:16/9; object-fit:cover}
+    .panel{background:var(--hl-surface); border:1px solid var(--hl-border); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow-1)}
+    .chips{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 0}
+    .chip{display:inline-block; padding:4px 10px; border-radius:999px; background:var(--hl-accent); color:#fff; font-size:.85rem}
+    .meta{color:var(--hl-muted); margin:6px 0 10px}
+    .actions{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap}
+    .btn{padding:10px 14px; border-radius:12px; border:1px solid var(--hl-border); background:var(--hl-surface); color:var(--hl-ink); cursor:pointer}
+    .btn.primary{background:linear-gradient(135deg, var(--hl-accent), var(--hl-accent-2)); color:#0b0f0c; border:none; font-weight:700}
+    .btn[aria-pressed="true"]{outline:2px solid var(--hl-accent)}
+    #map{height:360px; border-radius:var(--radius); border:1px solid var(--hl-border); overflow:hidden}
+    .section{margin-top:24px}
+    @media (max-width: 980px){ .hero{grid-template-columns:1fr} #map{height:280px} }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <div class="hero">
+      <div class="gallery">
+        <img id="cover" alt="cover">
+      </div>
+      <div class="panel">
+        <h1 id="name">Loading…</h1>
+        <p class="meta" id="category"></p>
+        <div id="tags" class="chips"></div>
+
+        <div class="actions">
+          <button id="favBtn" class="btn" aria-pressed="false">☆ Save</button>
+          <a id="navBtn" class="btn" target="_blank" rel="noopener">Navigate</a>
+          <a id="siteBtn" class="btn" target="_blank" rel="noopener" style="display:none">Website</a>
+          <a id="waBtn" class="btn" target="_blank" rel="noopener" style="display:none">WhatsApp</a>
+        </div>
+
+        <p id="desc" style="margin-top:12px"></p>
+        <p class="small" id="address"></p>
+        <p class="small" id="hours"></p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div id="map"></div>
+    </div>
+  </main>
+
+  <!-- 共用 header/footer -->
+  <script src="js/layout.js" defer></script>
+
+  <!-- 收藏模組 & 詳情渲染 -->
+  <script src="./js/store/favorites.js" defer></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+  <script src="./js/render/render-detail.js" defer></script>
+</body>
+</html>

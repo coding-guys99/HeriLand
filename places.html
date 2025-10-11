@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Explore — HeriLand</title>
+  <meta name="description" content="Discover Sarawak’s cities, food, nature, and culture through curated local places."/>
+  <link rel="stylesheet" href="css/app.css"/>
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <div class="container header-row">
+      <a class="brand" href="../index.html">
+        <img src="../assets/logo.svg" alt="" class="brand-mark"/>
+        <span class="brand-name">HeriLand</span>
+      </a>
+      <nav class="top-nav" id="primaryNav">
+        <a href="../index.html">Home</a>
+        <a href="places.html" aria-current="page">Explore</a>
+        <a href="favorites.html">Favorites</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="page-hero">
+      <div class="container">
+        <h1>Explore Sarawak</h1>
+        <p class="lead">Browse by division, theme, or keyword</p>
+        <div class="search-box">
+          <input type="search" id="searchInput" placeholder="Search by name, tag, or keyword...">
+        </div>
+      </div>
+    </section>
+
+    <!-- Division chips -->
+    <section class="section">
+      <div class="container">
+        <div id="divisionChips" class="chips-row"></div>
+      </div>
+    </section>
+
+    <!-- Tag chips -->
+    <section class="section">
+      <div class="container">
+        <div id="tagChips" class="chips-row"></div>
+      </div>
+    </section>
+
+<!-- Toolbar -->
+<section class="section">
+  <div class="container toolbar">
+    <div class="toolbar-left">
+      <strong id="resultCount">0</strong> results
+    </div>
+    <div class="toolbar-right">
+      <label class="sort">
+        <span>Sort</span>
+        <select id="sortSelect">
+          <option value="featured">Featured</option>
+          <option value="rating">Rating</option>
+          <option value="priceAsc">Price: $→$$$</option>
+          <option value="priceDesc">Price: $$$←$</option>
+          <option value="name">Name A→Z</option>
+        </select>
+      </label>
+      <div class="density" id="densityToggle" role="group" aria-label="Density">
+        <button data-density="cozy" class="on">Cozy</button>
+        <button data-density="compact">Compact</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Card grid -->
+<section class="section">
+  <div class="container">
+    <div id="placesGrid" class="card-grid card-grid--cozy"></div>
+    <div class="load-more-wrap">
+      <button id="btnLoadMore" class="btn-primary">Load more</button>
+    </div>
+  </div>
+</section>
+
+    <!-- Card grid -->
+    <section class="section">
+      <div class="container">
+        <div id="placesGrid" class="card-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 共用 Modal -->
+  <div class="modal-backdrop" id="placeModal" hidden aria-hidden="true">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="placeTitle">
+      <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+      <div class="modal-gallery" id="modalGallery"></div>
+      <div class="modal-body">
+        <h2 id="placeTitle"></h2>
+        <div class="place-meta" id="placeMeta"></div>
+        <p class="place-desc" id="placeDesc"></p>
+        <div class="place-info">
+          <div class="info-row" id="infoAddress"></div>
+          <div class="info-row" id="infoHours"></div>
+        </div>
+        <div class="action-row">
+          <a class="btn action" id="actCall" target="_blank" rel="noopener">📞 <span>Call</span></a>
+          <a class="btn action" id="actWA" target="_blank" rel="noopener">💬 <span>WhatsApp</span></a>
+          <a class="btn action" id="actWeb" target="_blank" rel="noopener">🖥️ <span>Website</span></a>
+          <a class="btn action" id="actMap" target="_blank" rel="noopener">🗺️ <span>Map</span></a>
+          <button class="btn action" id="actShare">🔗 <span>Share</span></button>
+          <button class="btn action" id="actFav">❤️ <span>Favorite</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-row">
+      <small>© <span id="year"></span> HeriLand</small>
+    </div>
+  </footer>
+
+  <script src="js/explore.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0.0",
+  "tags": [
+    { "id": "food",    "name_en": "Food" },
+    { "id": "seafood", "name_en": "Seafood" },
+    { "id": "halal",   "name_en": "Halal" },
+    { "id": "family",  "name_en": "Family-friendly" },
+    { "id": "cafe",    "name_en": "Cafe" }
+  ]
+}

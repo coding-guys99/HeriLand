@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "divisions": [
+    { "id": "kuching",    "name_en": "Kuching Division" },
+    { "id": "miri",       "name_en": "Miri Division" },
+    { "id": "sibu",       "name_en": "Sibu Division" },
+    { "id": "bintulu",    "name_en": "Bintulu Division" },
+    { "id": "sarikei",    "name_en": "Sarikei Division" },
+    { "id": "kapit",      "name_en": "Kapit Division" },
+    { "id": "mukah",      "name_en": "Mukah Division" },
+    { "id": "limbang",    "name_en": "Limbang Division" },
+    { "id": "samarahan",  "name_en": "Samarahan Division" },
+    { "id": "sri-aman",   "name_en": "Sri Aman Division" },
+    { "id": "serian",     "name_en": "Serian Division" },
+    { "id": "betong",     "name_en": "Betong Division" }
+  ],
+  "updatedAt": "2025-09-05T23:59:59.000Z"
+}

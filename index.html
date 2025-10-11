@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>HeriLand — Discover Sarawak</title>
+  <meta name="description" content="Explore Sarawak like a local — culture, food, nature, and curated picks."/>
+  <link rel="stylesheet" href="css/app.css"/>
+</head>
+<body class="mobile-app">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- AppBar（左 Logo、右通知，中間玻璃搜尋膠囊） -->
+  <header class="appbar" role="banner">
+    <div class="appbar-inner">
+      <a class="brand" href="index.html" aria-label="HeriLand">
+        <img src="assets/logo.svg" alt="" class="brand-mark"/>
+      </a>
+      <button class="search-pill" id="btnSearch" aria-label="Search places">
+        🔍 <span>Search places, tags, divisions…</span>
+      </button>
+      <button class="icon-btn" aria-label="Notifications">🔔</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero Rail（可放廣告/活動，低矮輪播） -->
+    <section class="hero-rail" aria-label="Highlights">
+      <div class="rail" id="heroRail" role="list"></div>
+    </section>
+
+    <!-- 快速 Chips（跳 Explore 並套好篩選） -->
+    <section class="section">
+      <div class="container">
+        <div class="chips-row" id="quickChips" role="list">
+          <!-- 由 JS 插入 Taste / Culture / Nature / Stay / Local / Experience / Modern -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 動態 Rows（如 Netflix） -->
+    <section class="rows" id="rowsHost">
+      <!-- 由 JS 依 collections.json 插入：
+           - Top Picks（poster-row）
+           - Recently Updated（mini-row）
+           - By Division（division-row）
+           - Theme rows（poster-row） -->
+    </section>
+  </main>
+
+  <!-- Place Detail Modal（沿用你的抽屜） -->
+  <div class="modal-backdrop" id="placeModal" hidden aria-hidden="true">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="placeTitle">
+      <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+      <div class="modal-gallery" id="modalGallery"></div>
+      <div class="modal-body">
+        <h2 id="placeTitle"></h2>
+        <div class="place-meta" id="placeMeta"></div>
+        <p class="place-desc" id="placeDesc"></p>
+        <div class="place-info">
+          <div class="info-row" id="infoAddress"></div>
+          <div class="info-row" id="infoHours"></div>
+        </div>
+        <div class="action-row">
+          <a class="btn action" id="actCall" target="_blank" rel="noopener">📞 <span>Call</span></a>
+          <a class="btn action" id="actWA"   target="_blank" rel="noopener">💬 <span>WhatsApp</span></a>
+          <a class="btn action" id="actWeb"  target="_blank" rel="noopener">🖥️ <span>Website</span></a>
+          <a class="btn action" id="actMap"  target="_blank" rel="noopener">🗺️ <span>Map</span></a>
+          <button class="btn action" id="actShare">🔗 <span>Share</span></button>
+          <button class="btn action" id="actFav">❤️ <span>Favorite</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container footer-row">
+      <small>© <span id="year"></span> HeriLand</small>
+    </div>
+  </footer>
+
+  <!-- 共用底部導航（partial 注入） -->
+  <div data-include="partials/tabbar.html"></div>
+
+
+  <script src="js/include.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <!-- 用 home.js（新首頁邏輯），取代原本 app.js -->
+  <script src="js/home.js" defer></script>
+</body>
+</html>

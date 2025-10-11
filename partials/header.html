@@ -1,0 +1,33 @@
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="index.html" aria-label="HeriLand — Sarawak">
+      <span class="logo">H</span>
+      <span class="wordmark">HeriLand</span>
+      <span class="tag">Sarawak</span>
+    </a>
+
+    <nav class="nav" aria-label="Primary">
+      <a href="places.html" data-i18n="nav.explore">Explore</a>
+      <a href="products.html" data-i18n="nav.shop">Shop</a>
+      <a href="about.html" data-i18n="nav.about">About</a>
+      <a href="contact.html" data-i18n="nav.contact">Contact</a>
+    </nav>
+
+    <div class="actions">
+      <!-- 城市切換：由 JS 依據 /data/cities/index.json 動態填入 -->
+      <div class="select-wrap" id="citySelectWrap" aria-label="Choose city"></div>
+
+      <!-- 語言切換（可擴充） -->
+      <select id="langSelect" aria-label="Language">
+        <option value="en">EN</option>
+        <option value="zh-TW">繁</option>
+        <option value="zh-CN">简</option>
+      </select>
+
+      <!-- 漢堡：行動裝置 -->
+      <button class="hamburger" id="menuToggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>

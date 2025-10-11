@@ -1,0 +1,41 @@
+/* Header */
+.site-header{position:sticky; top:0; z-index:50; backdrop-filter:saturate(140%) blur(8px);
+  background:color-mix(in oklab, var(--hl-bg) 85%, transparent); border-bottom:1px solid var(--hl-border)}
+.site-header .container{display:flex; align-items:center; gap:20px; height:64px}
+.brand{display:flex; align-items:center; gap:10px; font-weight:700}
+.brand .logo{display:grid; place-items:center; width:32px; height:32px; border-radius:10px;
+  background:linear-gradient(135deg, var(--hl-accent), var(--hl-accent-2)); color:#0b0f0c; font-weight:900}
+.brand .wordmark{letter-spacing:.3px}
+.brand .tag{color:var(--hl-accent-2); font-size:.9rem; margin-left:4px; opacity:.85}
+
+.nav{display:flex; gap:16px; margin-left:auto}
+.nav a{padding:8px 10px; border-radius:10px; color:var(--hl-muted)}
+.nav a:hover{background:var(--hl-surface); color:var(--hl-ink)}
+.nav a.active{outline:1px solid var(--hl-border); color:var(--hl-ink)}
+
+.actions{display:flex; align-items:center; gap:10px}
+.select-wrap select,
+#langSelect{
+  background:var(--hl-surface); color:var(--hl-ink); border:1px solid var(--hl-border);
+  padding:8px 12px; border-radius:10px; appearance:none
+}
+.hamburger{display:none; width:40px; height:40px; border:1px solid var(--hl-border);
+  background:var(--hl-surface); border-radius:12px}
+.hamburger span{display:block; width:18px; height:2px; background:var(--hl-ink); margin:6px auto}
+
+@media (max-width: 880px){
+  .nav{display:none}
+  .site-header.open .nav{display:flex; position:absolute; top:64px; left:0; right:0; padding:12px 20px;
+    background:var(--hl-surface); border-bottom:1px solid var(--hl-border)}
+  .hamburger{display:block}
+}
+
+/* Footer */
+.site-footer{margin-top:60px; border-top:1px solid var(--hl-border); background:var(--hl-surface)}
+.site-footer .container{display:flex; justify-content:space-between; align-items:flex-start; gap:20px; padding:24px 20px}
+.site-footer .brandline{display:flex; align-items:center; gap:10px; margin:0}
+.site-footer .logo{display:grid; place-items:center; width:28px; height:28px; border-radius:8px;
+  background:linear-gradient(135deg, var(--hl-accent), var(--hl-accent-2)); color:#0b0f0c; font-weight:900}
+.site-footer a{color:var(--hl-muted); margin-left:14px}
+.site-footer a:hover{color:var(--hl-ink)}
+.site-footer .sub{border-top:1px solid var(--hl-border); padding:12px 20px; text-align:center; color:var(--hl-muted); font-size:.9rem}

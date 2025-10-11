@@ -1,0 +1,23 @@
+.site-header{
+  position:sticky;top:0;z-index:10;
+  background:linear-gradient(#0b1110,#0b1110ea);
+  backdrop-filter:saturate(130%) blur(6px);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.site-header__inner{display:flex;align-items:center;gap:16px;padding:10px 0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800}
+.brand__logo{width:28px;height:28px}
+.brand__text{letter-spacing:.4px}
+
+.nav{margin-left:auto;display:flex;gap:12px;flex-wrap:wrap}
+.nav__link{
+  padding:8px 12px;border:1px solid var(--hl-line);
+  border-radius:999px;background:#111916;font-weight:700
+}
+.nav__link:hover{filter:brightness(1.1)}
+
+.site-footer{margin-top:40px;border-top:1px solid rgba(255,255,255,.08)}
+.site-footer__inner{display:flex;justify-content:space-between;align-items:center;padding:14px 0;color:var(--hl-muted)}
+.footer-links{display:flex;gap:12px}
+.footer-links a{opacity:.9}
+.footer-links a:hover{opacity:1}
