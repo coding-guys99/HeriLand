@@ -16,9 +16,10 @@
       <a class="brand" href="index.html" aria-label="HeriLand">
         <img src="assets/logo.svg" alt="" class="brand-mark"/>
       </a>
-      <button class="search-pill" id="btnSearch" aria-label="Search places">
-        🔍 <span>Search places, tags, divisions…</span>
-      </button>
+      <!-- Search pill（仍在原本 hero/toolbar 位置） -->
+<div class="search-pill" id="searchPill">
+  🔍 <input id="searchField" type="search" placeholder="Search: seafood, museum, beach…" autocomplete="off"/>
+</div>
       <button class="icon-btn" aria-label="Notifications">🔔</button>
     </div>
   </header>
@@ -48,18 +49,10 @@
     </section>
   </main>
   
-<!-- Fullscreen Glass Search -->
-<div class="sheet sheet--glass" id="sheetSearch" hidden>
-  <div class="search-bar">
-    <div class="search-input">
-      🔍 <input id="searchInput" type="search" placeholder="Search: seafood, museum, beach…" autocomplete="off"/>
-    </div>
-    <button class="search-cancel" id="btnSearchClose">Cancel</button>
-  </div>
-  <div class="search-scroll">
-    <div class="search-hint" id="searchHint">Popular: seafood · museum · beach</div>
-    <div class="search-list" id="searchList" role="list"></div>
-  </div>
+<!-- Fullscreen glass backdrop + anchored results -->
+<div id="searchOverlay" class="overlay-glass" hidden>
+  <div id="overlayResults" class="overlay-results" role="list"></div>
+  <button id="overlayClose" class="overlay-close" aria-label="Close">Cancel</button>
 </div>
 
 
