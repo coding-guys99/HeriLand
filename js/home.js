@@ -5,19 +5,17 @@
    - renders Netflix-like rows
    ========================================================= */
 import { sheet, toast } from './ui.js';
-/* =========================================================
-   HeriLand — Home (rows-first)
-   ========================================================= */
+
 (async () => {
   const $ = s => document.querySelector(s);
 
   // 根目錄部署（GitHub Pages 友善）
-  const ROOT = '.';                      // ← 全站在根目錄
+  const ROOT = '.';
   const url = (p) => {
     if (!p) return '#';
-    if (/^https?:\/\//i.test(p)) return p;      // 絕對網址
-    if (p.startsWith('/')) return `${ROOT}${p}`; // 以 / 開頭 → 補 ROOT
-    return `${ROOT}/${p.replace(/^\.\//,'')}`;   // 其他相對 → 補 ROOT/
+    if (/^https?:\/\//i.test(p)) return p;       // 絕對網址
+    if (p.startsWith('/')) return `${ROOT}${p}`;  // 以 / 開頭 → 補 ROOT
+    return `${ROOT}/${p.replace(/^\.\//,'')}`;    // 其他相對 → 補 ROOT/
   };
 
   // 年份
@@ -26,7 +24,7 @@ import { sheet, toast } from './ui.js';
 
   // helpers
   async function loadJSON(path){
-    const u = url(path);                           // ★ 統一從這裡走 url()
+    const u = url(path);
     try{
       const r = await fetch(u);
       if(!r.ok) throw new Error(`${r.status} ${u}`);
@@ -52,13 +50,11 @@ import { sheet, toast } from './ui.js';
   const qc = $("#quickChips");
   QUICK.forEach(q=>{
     const a = el("a","chip",q.label);
-    a.href = url(`places.html#?tags=${encodeURIComponent(q.tags.join(","))}`); // ← 根目錄檔名
+    a.href = url(`places.html#?tags=${encodeURIComponent(q.tags.join(","))}`);
     qc.appendChild(a);
   });
 
-  // 之後你的其餘程式碼照舊…
-
-  // 載入 divisions 與 merchants
+  // ── 載入 divisions 與 merchants
   const cities = await loadJSON('data/cities.json');
   const divisionIds = (cities?.divisions || []).map(d=>d.id);
 
@@ -68,7 +64,7 @@ import { sheet, toast } from './ui.js';
     if (data?.items) ALL.push(...data.items);
   }
 
-  // Hero rail
+  // ── Hero rail
   function renderHero(items){
     const rail = $("#heroRail"); rail.innerHTML = "";
     items.forEach(it=>{
@@ -83,7 +79,7 @@ import { sheet, toast } from './ui.js';
     });
   }
 
-  // Row builders
+  // ── Row builders
   function cardPoster(m){
     const a = el("article","card poster",`
       <div class="thumb" style="background-image:url('${m.cover}')"></div>
@@ -103,7 +99,6 @@ import { sheet, toast } from './ui.js';
   function divisionPill(d){
     const a = el("a","division-pill",`<span>${d.name_en.replace(" Division","")}</span>`);
     a.href = url(`places.html#/d/${d.id}`);
-
     return a;
   }
 
@@ -126,7 +121,7 @@ import { sheet, toast } from './ui.js';
     const sec = el("section","row-section");
     const head = el("div","row-head",`
       <h2>${rowDef.title || ""}</h2>
-      ${rowDef.type!=="division-row" ? `<a class="see-all" href="${url('places.html')}">See all</a>` : ''
+      ${rowDef.type!=="division-row" ? `<a class="see-all" href="${url('places.html')}">See all</a>` : ''}
     `);
     const rail = el("div","rail");
 
@@ -143,7 +138,7 @@ import { sheet, toast } from './ui.js';
     host.appendChild(sec);
   }
 
-  // Modal（沿用你的）
+  // ── Modal（沿用你的）
   const modal = $("#placeModal");
   const modalCloseBtn = $("#modalClose");
   function fillText(sel, text){ const e=$(sel); if(!e) return; e.textContent = text || ""; }
@@ -196,7 +191,70 @@ import { sheet, toast } from './ui.js';
   function toggleFavorite(id){ const s=getFavs(); s.has(id)? s.delete(id): s.add(id); saveFavs(s); }
   function updateFavButton(id){ const s=getFavs(); const btn=$("#actFav"); if(!btn) return; btn.innerHTML = s.has(id) ? "❤️ <span>Favorited</span>" : "🤍 <span>Favorite</span>"; }
 
-  // collections → render
+  // ===== Search Sheet integration（搬進 IIFE，能取用 ALL / openModal） =====
+  document.getElementById('btnSearch')?.addEventListener('click', () => {
+    sheet.open('sheetSearch');
+    const ipt = document.getElementById('searchInput');
+    const rail = document.getElementById('searchRail');
+    const hint = document.getElementById('searchHint');
+    if (ipt) { ipt.value = ''; ipt.focus(); }
+    if (rail) rail.innerHTML = '';
+    if (hint) hint.textContent = 'Type to search places. Showing top matches.';
+  });
+  document.getElementById('btnSearchClose')?.addEventListener('click', () => sheet.close());
+  sheet.bindBackdrop('sheetSearch');
+
+  function searchMerchants(q){
+    if (!q) return [];
+    const s = q.trim().toLowerCase();
+    const score = (m) => {
+      let sc = 0;
+      if (m.name?.toLowerCase().startsWith(s)) sc += 5;
+      if (m.name?.toLowerCase().includes(s))  sc += 3;
+      if (m.description?.toLowerCase().includes(s)) sc += 2;
+      if ((m.tagIds||[]).some(t => String(t).toLowerCase().includes(s))) sc += 1;
+      return sc;
+    };
+    return [...ALL]
+      .map(m => [score(m), m])
+      .filter(([sc]) => sc>0)
+      .sort((a,b)=>b[0]-a[0])
+      .slice(0,12)
+      .map(([,m])=>m);
+  }
+
+  function renderSearchResults(list){
+    const rail = document.getElementById('searchRail');
+    const hint = document.getElementById('searchHint');
+    rail.innerHTML = '';
+    if (!list.length){
+      if (hint) hint.textContent = 'No results. Try another keyword.';
+      return;
+    }
+    if (hint) hint.textContent = `Top results · ${list.length}`;
+    list.forEach(m => {
+      const card = document.createElement('article');
+      card.className = 'card mini';
+      card.innerHTML = `
+        <div class="thumb" style="background-image:url('${m.cover}')"></div>
+        <div class="meta"><span>⭐ ${m.rating ?? '-'}</span></div>
+      `;
+      card.addEventListener('click', () => {
+        sheet.close();
+        openModal(m);
+      });
+      rail.appendChild(card);
+    });
+  }
+
+  let tmr=null;
+  document.getElementById('searchInput')?.addEventListener('input', (e) => {
+    clearTimeout(tmr);
+    const q = e.target.value;
+    tmr = setTimeout(()=> renderSearchResults(searchMerchants(q)), 120);
+  });
+
+  // ── collections → render
   const collections = await loadJSON('data/collections.json');
   const rows = collections?.rows || [];
   const heroDef = rows.find(r => r.type === "hero-rail");
@@ -205,66 +263,3 @@ import { sheet, toast } from './ui.js';
 
   console.log("Home rows initialized ✅");
 })();
-
-// ===== Search Sheet integration =====
-// 1) 綁定按鈕
-document.getElementById('btnSearch')?.addEventListener('click', () => {
-  // 開啟抽屜並清空
-  sheet.open('sheetSearch');
-  const ipt = document.getElementById('searchInput');
-  const rail = document.getElementById('searchRail');
-  const hint = document.getElementById('searchHint');
-  if (ipt) { ipt.value = ''; ipt.focus(); }
-  if (rail) rail.innerHTML = '';
-  if (hint) hint.textContent = 'Type to search places. Showing top matches.';
-});
-document.getElementById('btnSearchClose')?.addEventListener('click', () => sheet.close());
-sheet.bindBackdrop('sheetSearch');
-
-// 2) 即時搜尋（前綴 + 名稱/描述/標籤）
-function searchMerchants(q){
-  if (!q) return [];
-  const s = q.trim().toLowerCase();
-  const score = (m) => {
-    let sc = 0;
-    if (m.name?.toLowerCase().startsWith(s)) sc += 5;
-    if (m.name?.toLowerCase().includes(s)) sc += 3;
-    if (m.description?.toLowerCase().includes(s)) sc += 2;
-    if ((m.tagIds||[]).some(t => String(t).toLowerCase().includes(s))) sc += 1;
-    return sc;
-  };
-  return [...ALL].map(m => [score(m), m]).filter(([sc]) => sc>0).sort((a,b)=>b[0]-a[0]).slice(0,12).map(([,m])=>m);
-}
-
-// 3) 將結果渲染成一條橫滑 rail（用你現有的 mini 卡）
-function renderSearchResults(list){
-  const rail = document.getElementById('searchRail');
-  const hint = document.getElementById('searchHint');
-  rail.innerHTML = '';
-  if (!list.length){
-    if (hint) hint.textContent = 'No results. Try another keyword.';
-    return;
-  }
-  if (hint) hint.textContent = `Top results · ${list.length}`;
-  list.forEach(m => {
-    const card = document.createElement('article');
-    card.className = 'card mini';
-    card.innerHTML = `
-      <div class="thumb" style="background-image:url('${m.cover}')"></div>
-      <div class="meta"><span>⭐ ${m.rating ?? '-'}</span></div>
-    `;
-    card.addEventListener('click', () => {
-      sheet.close();
-      openModal(m);
-    });
-    rail.appendChild(card);
-  });
-}
-
-// 4) 監聽輸入（加防抖）
-let tmr=null;
-document.getElementById('searchInput')?.addEventListener('input', (e) => {
-  clearTimeout(tmr);
-  const q = e.target.value;
-  tmr = setTimeout(()=> renderSearchResults(searchMerchants(q)), 120);
-});
