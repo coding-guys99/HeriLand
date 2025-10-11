@@ -5,6 +5,9 @@
    - renders Netflix-like rows
    - includes fullscreen glass search overlay
    ========================================================= */
+/* =========================================================
+   HeriLand — Home (rows-first)
+   ========================================================= */
 import { sheet, toast } from './ui.js';
 
 (async () => {
@@ -20,9 +23,10 @@ import { sheet, toast } from './ui.js';
   };
 
   // 年份
-  $("#year")?.textContent = new Date().getFullYear();
-
-  // ===== helper =====
+  const y = document.getElementById("year");
+  if (y) y.textContent = new Date().getFullYear();
+  
+      // ===== helper =====
   async function loadJSON(path){
     const u = url(path);
     try{
