@@ -609,3 +609,67 @@ body{ padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
   .search-sub, .search-tags{ color:#cfd6dc }
   .search-meta{ color:#dfe5ea }
 }
+
+/* ===== Fullscreen glass backdrop ===== */
+.overlay-glass{
+  position: fixed; inset: 0; z-index: 1200;
+  background: color-mix(in srgb, rgba(15,18,21,.55) 100%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(120%); backdrop-filter: blur(18px) saturate(120%);
+}
+.overlay-glass[hidden]{ display:none !important; }
+
+/* 讓原頁的搜尋膠囊在 overlay 之上可打字 */
+body.searching { overflow: hidden; }
+body.searching #searchPill{ position: relative; z-index: 1300; }
+
+/* 結果面板（定位到搜尋框下緣） */
+.overlay-results{
+  position: fixed; /* 由 JS 用 rect 決定 top/left/width */
+  max-height: min(58vh, 640px);
+  overflow: auto;
+  background: color-mix(in srgb, #ffffff 92%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(120%); backdrop-filter: blur(10px) saturate(120%);
+  border:1px solid rgba(0,0,0,.08);
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(0,0,0,.25);
+  padding: 6px 4px;
+}
+
+/* 一行一個（微博式） */
+.result-item{
+  display:flex; align-items:center; gap:10px;
+  width: 100%; padding:10px; border-radius:10px; border:1px solid rgba(0,0,0,.06);
+  background: color-mix(in srgb, #ffffff 96%, transparent);
+  margin: 6px; cursor: pointer;
+}
+.result-thumb{ width:72px; height:56px; border-radius:10px; background:#ddd center/cover no-repeat; flex:none }
+.result-main{ min-width:0; flex:1 }
+.result-title{ font-weight:700; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.result-sub{ color:#555; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px }
+.result-meta{ color:#444; font-size:12px; margin-left:6px; white-space:nowrap; }
+
+.overlay-close{
+  position: fixed; right: 12px; top: 10px; z-index: 1300;
+  appearance: none; border: 0; cursor: pointer;
+  background: rgba(255,255,255,.85);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 999px; padding: 8px 12px; font-weight: 700;
+}
+
+@media (prefers-color-scheme: dark){
+  .overlay-results, .result-item{
+    background: color-mix(in srgb, #0b0f12 70%, transparent);
+    border-color: rgba(255,255,255,.08);
+  }
+  .result-sub, .result-meta{ color:#cfd6dc }
+  .overlay-close{ background: rgba(32,36,40,.7); color:#fff; border-color: rgba(255,255,255,.1) }
+}
+
+/* 你的搜尋 pill 外觀（可沿用原本樣式，這裡給一個安全底） */
+.search-pill{
+  display:flex; align-items:center; gap:8px;
+  background:#fff; border:1px solid rgba(0,0,0,.08); border-radius: 12px;
+  padding: 10px 12px;
+}
+.search-pill input{ flex:1; border:0; outline:0; font-size:16px; background:transparent; }
