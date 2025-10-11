@@ -1,73 +1,74 @@
 /* =========================================================
    HeriLand — Home (rows-first)
-   - reads /data/collections.json
+   - reads data/collections.json
    - aggregates merchants from all divisions
    - renders Netflix-like rows
    ========================================================= */
-
-/* HeriLand — Home (rows-first) */
 (async () => {
   const $ = s => document.querySelector(s);
 
-  // ★ 新增：依是否在 /pages/ 底下自動決定根路徑（GitHub Pages 友善）
+  // GitHub Pages 友善：自動前綴
   const ROOT = location.pathname.includes('/pages/') ? '..' : '.';
   const url = (p) => {
     if (!p) return '#';
-    if (/^https?:\/\//i.test(p)) return p;       // 絕對網址直接用
-    if (p.startsWith('/')) return `${ROOT}${p}`; // 以 / 開頭 → 補上 ROOT
-    return `${ROOT}/${p.replace(/^\.\//,'')}`;   // 其他相對路徑 → 補上 ROOT/
+    if (/^https?:\/\//i.test(p)) return p;          // 絕對網址
+    if (p.startsWith('/')) return `${ROOT}${p}`;     // 以 / 開頭 → 補 ROOT
+    return `${ROOT}/${p.replace(/^\.\//,'')}`;       // 其他相對 → 補 ROOT/
   };
 
-/* HeriLand — Home (rows-first) */
-(async () => {
-  const $ = s => document.querySelector(s);
-
-  // footer 年份：容錯處理，沒有就略過
-  const yearEl = document.getElementById("year");
+  // footer 年份
+  const yearEl = $("#year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  // ---------- helpers ----------
+  // helpers
   async function loadJSON(path){
-    try{ const r = await fetch(path); if(!r.ok) throw new Error(r.status); return await r.json(); }
-    catch(e){ console.warn("[loadJSON]", path, e); return null; }
+    const u = url(path);
+    try{
+      const r = await fetch(u);
+      if(!r.ok) throw new Error(`${r.status} ${u}`);
+      return await r.json();
+    }catch(e){
+      console.warn("[loadJSON]", u, e);
+      return null;
+    }
   }
   function el(tag, cls, html){ const x=document.createElement(tag); if(cls) x.className=cls; if(html!=null) x.innerHTML=html; return x; }
-  function mapLink(loc, addr){ if(loc?.lat && loc?.lng) return `https://www.google.com/maps?q=${loc.lat},${loc.lng}`; if(addr) return `https://www.google.com/maps?q=${encodeURIComponent(addr)}`; return null; }
+  function mapLink(loc, addr){ if (loc?.lat && loc?.lng) return `https://www.google.com/maps?q=${loc.lat},${loc.lng}`; if (addr) return `https://www.google.com/maps?q=${encodeURIComponent(addr)}`; return null; }
 
-  // ---------- search pill ----------
+  // 搜尋膠囊 → Explore
   $("#btnSearch")?.addEventListener("click", () => {
-    location.href = "places.html";
+    location.href = url('pages/places.html');
   });
 
-  // ---------- quick chips ----------
+  // Quick chips
   const QUICK = [
-    { label:"Taste", tags:["food"] },
-    { label:"Culture", tags:["culture","museum","temple"] },
-    { label:"Nature", tags:["nature","park","waterfall","beach"] },
-    { label:"Stay", tags:["stay","hotel"] },
-    { label:"Local", tags:["local","market"] },
+    { label:"Taste",      tags:["food"] },
+    { label:"Culture",    tags:["culture","museum","temple"] },
+    { label:"Nature",     tags:["nature","park","waterfall","beach"] },
+    { label:"Stay",       tags:["stay","hotel"] },
+    { label:"Local",      tags:["local","market"] },
     { label:"Experience", tags:["scenic","event","adventure","family"] },
-    { label:"Modern", tags:["modern","shopping"] }
+    { label:"Modern",     tags:["modern","shopping"] }
   ];
   const qc = $("#quickChips");
   QUICK.forEach(q=>{
     const a = el("a","chip",q.label);
-    a.href = `places.html#?tags=${encodeURIComponent(q.tags.join(","))}`;
+    a.href = url(`pages/places.html#?tags=${encodeURIComponent(q.tags.join(","))}`);
     qc.appendChild(a);
   });
 
-  // ---------- load cities & merchants ----------
-  const cities = await loadJSON("data/cities.json");
+  // 載入 divisions 與 merchants
+  const cities = await loadJSON('data/cities.json');
   const divisionIds = (cities?.divisions || []).map(d=>d.id);
-  // 聚合所有 division 的 merchants（首頁要跨區策展）
+
   let ALL = [];
   for (const id of divisionIds){
     const data = await loadJSON(`data/merchants/${id}.json`);
     if (data?.items) ALL.push(...data.items);
   }
 
-  // ---------- hero rail ----------
-    function renderHero(items){
+  // Hero rail
+  function renderHero(items){
     const rail = $("#heroRail"); rail.innerHTML = "";
     items.forEach(it=>{
       const card = el("a","hero-card",`
@@ -81,7 +82,7 @@
     });
   }
 
-  // ---------- row builders ----------
+  // Row builders
   function cardPoster(m){
     const a = el("article","card poster",`
       <div class="thumb" style="background-image:url('${m.cover}')"></div>
@@ -100,16 +101,15 @@
   }
   function divisionPill(d){
     const a = el("a","division-pill",`<span>${d.name_en.replace(" Division","")}</span>`);
-    a.href = url(`places.html#/d/${d.id}`);
+    a.href = url(`pages/places.html#/d/${d.id}`);
     return a;
   }
-
 
   function filterBySource(src){
     let arr = [...ALL];
     if (src?.filter?.featured) arr = arr.filter(x=>x.featured);
     if (src?.tags?.length) {
-      const set = new Set(src.tags.map(t=>t.toLowerCase()));
+      const set = new Set(src.tags.map(t=>String(t).toLowerCase()));
       arr = arr.filter(x => (x.tagIds||[]).some(t => set.has(String(t).toLowerCase())));
     }
     if (src?.sort === "updatedAt:desc"){
@@ -121,13 +121,11 @@
 
   function renderRow(rowDef){
     const host = $("#rowsHost");
-    // section head
     const sec = el("section","row-section");
     const head = el("div","row-head",`
       <h2>${rowDef.title || ""}</h2>
-      ${rowDef.type!=="division-row" ? `<a class="see-all" href="${url('places.html')}">See all</a>` : ''}
+      ${rowDef.type!=="division-row" ? `<a class="see-all" href="${url('pages/places.html')}">See all</a>` : ''}
     `);
-
     const rail = el("div","rail");
 
     if (rowDef.type === "poster-row"){
@@ -137,12 +135,13 @@
     } else if (rowDef.type === "division-row"){
       (cities?.divisions||[]).forEach(d => rail.appendChild(divisionPill(d)));
     }
+
     sec.appendChild(head);
     sec.appendChild(rail);
     host.appendChild(sec);
   }
 
-  // ---------- modal ----------
+  // Modal（沿用你的）
   const modal = $("#placeModal");
   const modalCloseBtn = $("#modalClose");
   function fillText(sel, text){ const e=$(sel); if(!e) return; e.textContent = text || ""; }
@@ -163,11 +162,11 @@
     action($("#actWA"), m.whatsapp ? `https://wa.me/${m.whatsapp.replace(/\D/g,'')}` : null);
     action($("#actWeb"), m.website || null);
     action($("#actMap"), mapLink(m.location, m.address));
-    // share & fav
+
     $("#actShare").onclick = async () => {
-      const url = `${location.origin}${location.pathname}#/p/${m.id}`;
-      if (navigator.share) { try{ await navigator.share({title:m.name, text:m.description||"", url}); }catch{} }
-      else { await navigator.clipboard?.writeText(url); alert("Link copied."); }
+      const shareUrl = `${location.origin}${location.pathname}#/p/${m.id}`;
+      if (navigator.share) { try{ await navigator.share({title:m.name, text:m.description||"", url: shareUrl}); }catch{} }
+      else { await navigator.clipboard?.writeText(shareUrl); alert("Link copied."); }
     };
     $("#actFav").onclick = () => { toggleFavorite(m.id); updateFavButton(m.id); };
     updateFavButton(m.id);
@@ -188,22 +187,18 @@
     const m = location.hash.match(/^#\/p\/(.+)$/); if (!m) closeModal();
   });
 
-  // favorites（沿用你的 key）
+  // favorites
   const FAV_KEY = "heriland:favs";
   function getFavs(){ try{ return new Set(JSON.parse(localStorage.getItem(FAV_KEY)||"[]")); }catch{ return new Set(); } }
   function saveFavs(s){ localStorage.setItem(FAV_KEY, JSON.stringify([...s])); }
   function toggleFavorite(id){ const s=getFavs(); s.has(id)? s.delete(id): s.add(id); saveFavs(s); }
   function updateFavButton(id){ const s=getFavs(); const btn=$("#actFav"); if(!btn) return; btn.innerHTML = s.has(id) ? "❤️ <span>Favorited</span>" : "🤍 <span>Favorite</span>"; }
 
-  // ---------- collections → render ----------
-    const collections = await loadJSON( url('data/collections.json') );
+  // collections → render
+  const collections = await loadJSON('data/collections.json');
   const rows = collections?.rows || [];
-
-  // Hero rail
   const heroDef = rows.find(r => r.type === "hero-rail");
   if (heroDef?.items?.length) renderHero(heroDef.items);
-
-  // other rows
   rows.filter(r => r.type !== "hero-rail").forEach(renderRow);
 
   console.log("Home rows initialized ✅");
