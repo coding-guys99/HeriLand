@@ -310,9 +310,9 @@ body.search-lock{
   content:"";
   position:absolute; left:50%; transform:translateX(-50%);
   bottom: calc(8px + env(safe-area-inset-bottom));
-  width: min(92%, 480px);
+  width: min(92%, 300px);
   height: 56px;
-  border-radius: 999px;
+  border-radius: 30px;
   background: color-mix(in srgb, #ffffff 86%, transparent);
   -webkit-backdrop-filter: blur(16px) saturate(120%);
   backdrop-filter: blur(16px) saturate(120%);
@@ -360,6 +360,7 @@ body.search-lock{
   font-size: 15px;
   line-height: 1.25;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  align-item:left;
 }
 .search-sub{
   color:#666 !important;
@@ -376,7 +377,7 @@ body.search-lock{
 .search-meta{
   color:#333 !important;
   font-size:13px; font-weight:700;
-  display:flex; align-items:center; justify-content:flex-end; gap:4px;
+  display:flex; align-items:right; justify-content:flex-end; gap:4px;
 }
 .search-meta::before{ content:"⭐"; color:#e6b800; }
 
