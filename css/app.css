@@ -528,3 +528,39 @@ body{ padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
   .tabbar .tab{ color:#f7f7f7 }
   .tabbar .tab.active{ background: rgba(255,255,255,.08) }
 }
+
+/* ===== Bottom Sheet (full) ===== */
+.sheet {
+  position: fixed; inset: 0; z-index: 1200; display: grid; place-items: end;
+  background: rgba(0,0,0,.35);
+}
+.sheet[hidden]{ display:none !important; }
+.sheet-panel{
+  width:100%; max-height: 85vh; background: #fff; border-radius: 16px 16px 0 0;
+  box-shadow: 0 -10px 24px rgba(0,0,0,.16); overflow:auto;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+  animation: sheetUp .18s ease-out;
+}
+@keyframes sheetUp { from { transform: translateY(12px); opacity:.6 } to { transform: translateY(0); opacity:1 } }
+.sheet-head{ display:flex; align-items:center; gap:10px; padding: 4px 4px 8px }
+.sheet-title{ font-weight:800; font-size: 16px; margin-right:auto }
+.sheet-close{ appearance:none; border:0; background:#f2f2f2; border-radius:10px; padding:6px 10px; cursor:pointer }
+.sheet-input{ display:flex; align-items:center; gap:8px; padding: 10px 12px; border:1px solid var(--line); border-radius: 12px; background:#fff; margin: 0 4px 10px }
+.sheet-input input{ flex:1; border:0; outline:none; font-size:16px; }
+.sheet-rail{ display:grid; grid-auto-flow:column; grid-auto-columns: 44%; gap:10px; overflow-x:auto; padding: 6px 4px; }
+.sheet-hint{ font-size: 12px; color: var(--muted); margin: 6px 6px 0 }
+
+/* ===== Toast ===== */
+#toasts{
+  position: fixed; left: 0; right: 0; bottom: calc(74px + env(safe-area-inset-bottom));
+  display:grid; gap:8px; justify-items:center; z-index: 1300; pointer-events:none;
+}
+.toast{
+  background: rgba(0,0,0,.85); color:#fff; padding:10px 12px; border-radius: 12px; transform: translateY(8px); opacity: 0;
+  transition: .2s ease; max-width: 88%; text-align:center; pointer-events:auto;
+}
+.toast.in{ transform: translateY(0); opacity: 1; }
+@media (prefers-color-scheme: dark){
+  .sheet-panel{ background: #0f1215; color: #f5f5f5; }
+  .sheet-input{ background: #151a1f; border-color: rgba(255,255,255,.08); }
+}
