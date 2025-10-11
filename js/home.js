@@ -193,100 +193,120 @@ import { sheet, toast } from './ui.js';
   function toggleFavorite(id){ const s=getFavs(); s.has(id)? s.delete(id): s.add(id); saveFavs(s); }
   function updateFavButton(id){ const s=getFavs(); const btn=$("#actFav"); if(!btn) return; btn.innerHTML = s.has(id) ? "❤️ <span>Favorited</span>" : "🤍 <span>Favorite</span>"; }
 
-  // ===== Fullscreen Glass Search =====
-  const overlay   = document.getElementById('searchOverlay');
-  const resultsEl = document.getElementById('overlayResults');
-  const closeBtn  = document.getElementById('overlayClose');
-  const field     = document.getElementById('searchField');
-  const pill      = document.getElementById('searchPill');
-  let lockY = 0;
+// ===== TikTok-style Fullscreen Search =====
+const overlay    = document.getElementById('searchOverlay');
+const inputEl    = document.getElementById('overlayInput');
+const listEl     = document.getElementById('overlayList');
+const hintEl     = document.getElementById('searchHint');
+const btnOpen    = document.getElementById('btnSearch');
+const btnClose   = document.getElementById('overlayClose');
 
-  function lockScroll(){
-    lockY = window.scrollY || document.documentElement.scrollTop || 0;
-    document.body.style.setProperty('--lock-top', `-${lockY}px`);
-    document.body.classList.add('search-lock');
+let _lockY = 0;
+function lockScroll(){
+  _lockY = window.scrollY || document.documentElement.scrollTop || 0;
+  document.documentElement.style.setProperty('--lock-top', `-${_lockY}px`);
+  document.body.style.setProperty('--lock-top', `-${_lockY}px`);
+  document.body.classList.add('search-lock');     // 真正鎖住背景頁
+}
+function unlockScroll(){
+  document.body.classList.remove('search-lock');
+  document.body.style.removeProperty('--lock-top');
+  document.documentElement.style.removeProperty('--lock-top');
+  window.scrollTo(0, _lockY || 0);
+}
+
+function openSearch(){
+  if (!overlay) return;
+  overlay.hidden = false;
+  requestAnimationFrame(()=> overlay.classList.add('active'));
+  lockScroll();
+  if (inputEl){
+    inputEl.value = '';
+    inputEl.focus();
   }
-  function unlockScroll(){
-    document.body.classList.remove('search-lock');
-    window.scrollTo(0, lockY || 0);
+  if (listEl) listEl.innerHTML = '';
+  if (hintEl) hintEl.textContent = 'Popular: seafood · museum · beach';
+}
+function closeSearch(){
+  if (!overlay) return;
+  overlay.classList.remove('active');
+  setTimeout(()=> overlay.hidden = true, 250);
+  unlockScroll();
+}
+
+btnOpen?.addEventListener('click', openSearch);
+btnClose?.addEventListener('click', closeSearch);
+overlay?.addEventListener('click', (e)=>{
+  // 點擊黑玻璃空白處關閉（不影響內容捲動）
+  const isBackdrop = e.target === overlay;
+  if (isBackdrop) closeSearch();
+});
+window.addEventListener('keydown', e=>{ if (e.key === 'Escape') closeSearch(); });
+
+// 搜尋函式：沿用你打分策略
+function searchMerchants(q){
+  if (!q) return [];
+  const s = q.trim().toLowerCase();
+  const score = (m) => {
+    let sc = 0;
+    const name = (m.name||'').toLowerCase();
+    const desc = (m.description||'').toLowerCase();
+    if (name.startsWith(s)) sc += 6;
+    if (name.includes(s))  sc += 3;
+    if (desc.includes(s))  sc += 2;
+    if ((m.tagIds||[]).some(t => String(t).toLowerCase().includes(s))) sc += 1;
+    return sc;
+  };
+  return [...ALL]
+    .map(m => [score(m), m])
+    .filter(([sc]) => sc > 0)
+    .sort((a,b)=> b[0]-a[0])
+    .slice(0, 50)
+    .map(([,m])=>m);
+}
+
+// 渲染：整頁一行一筆（使用 .search-item 樣式）
+function renderSearchList(list){
+  if (!listEl) return;
+  listEl.innerHTML = '';
+  if (!list.length){
+    if (hintEl) hintEl.textContent = 'No results. Try another keyword.';
+    return;
   }
+  if (hintEl) hintEl.textContent = `Results · ${list.length}`;
 
-  function openOverlay(){
-    if (!overlay) return;
-    overlay.hidden = false;
-    lockScroll();
-    document.body.classList.add('searching');
-    requestAnimationFrame(()=> overlay.classList.add('active'));
-    field?.focus();
-  }
-
-  function closeOverlay(){
-    if (!overlay) return;
-    overlay.classList.remove('active');
-    document.body.classList.remove('searching');
-    setTimeout(()=> overlay.hidden = true, 250);
-    unlockScroll();
-  }
-
-  pill?.addEventListener('click', openOverlay);
-  closeBtn?.addEventListener('click', closeOverlay);
-  overlay?.addEventListener('click', e => { if (e.target === overlay) closeOverlay(); });
-  window.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
-
-  // ===== 搜尋邏輯 =====
-  function searchMerchants(q){
-    if (!q) return [];
-    const s = q.trim().toLowerCase();
-    const score = (m) => {
-      let sc = 0;
-      const name = (m.name||'').toLowerCase();
-      const desc = (m.description||'').toLowerCase();
-      if (name.startsWith(s)) sc += 6;
-      if (name.includes(s))  sc += 3;
-      if (desc.includes(s))  sc += 2;
-      if ((m.tagIds||[]).some(t => String(t).toLowerCase().includes(s))) sc += 1;
-      return sc;
-    };
-    return [...ALL]
-      .map(m => [score(m), m])
-      .filter(([sc]) => sc>0)
-      .sort((a,b)=>b[0]-a[0])
-      .slice(0, 30)
-      .map(([,m])=>m);
-  }
-
-  function renderResults(list){
-    resultsEl.innerHTML = '';
-    if (!list.length){
-      const empty = document.createElement('div');
-      empty.style.cssText = 'padding:12px;text-align:center;color:#666';
-      empty.textContent = 'No results. Try another keyword.';
-      resultsEl.appendChild(empty);
-      return;
-    }
-    list.forEach(m=>{
-      const row = document.createElement('div');
-      row.className = 'result-item';
-      row.innerHTML = `
-        <div class="result-thumb" style="background-image:url('${m.cover}')"></div>
-        <div class="result-main">
-          <div class="result-title">${m.name}</div>
-          <div class="result-sub">${m.address || ''}</div>
-        </div>
-        <div class="result-meta">${m.rating ?? ''}</div>
-      `;
-      row.addEventListener('click', ()=>{ closeOverlay(); openModal(m); });
-      resultsEl.appendChild(row);
-    });
-  }
-
-  // ===== 即時搜尋（防抖） =====
-  let tmr=null;
-  field?.addEventListener('input', (e)=>{
-    clearTimeout(tmr);
-    const q = e.target.value;
-    tmr = setTimeout(()=> renderResults(searchMerchants(q)), 120);
+  list.forEach(m=>{
+    const row = document.createElement('button');
+    row.className = 'search-item';
+    row.type = 'button';
+    row.innerHTML = `
+      <div class="search-thumb" style="background-image:url('${m.cover}')"></div>
+      <div class="search-main">
+        <div class="search-title">${m.name}</div>
+        <div class="search-sub">${m.address || ''}</div>
+        <div class="search-tags">${(m.tagIds||[]).join(' · ')}</div>
+      </div>
+      <div class="search-meta">
+        ${m.rating ? `⭐ ${m.rating}` : ''} ${m.priceLevel ? ` · ${'💲'.repeat(m.priceLevel)}` : ''}
+      </div>
+    `;
+    row.addEventListener('click', ()=>{ closeSearch(); openModal(m); });
+    listEl.appendChild(row);
   });
+}
+
+// 即時輸入（防抖）
+let _tmr = null;
+inputEl?.addEventListener('input', (e)=>{
+  clearTimeout(_tmr);
+  const q = e.target.value;
+  _tmr = setTimeout(()=> renderSearchList(searchMerchants(q)), 120);
+});
+
+// 初次打開：清空結果
+inputEl?.addEventListener('focus', ()=>{
+  if (listEl) listEl.innerHTML = '';
+});
 
   // ===== collections → render =====
   const collections = await loadJSON('data/collections.json');
