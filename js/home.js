@@ -3,10 +3,7 @@
    - reads data/collections.json
    - aggregates merchants from all divisions
    - renders Netflix-like rows
-   - includes fullscreen glass search overlay
-   ========================================================= */
-/* =========================================================
-   HeriLand — Home (rows-first)
+   - includes fullscreen glass search overlay (TikTok style)
    ========================================================= */
 import { sheet, toast } from './ui.js';
 
@@ -25,8 +22,8 @@ import { sheet, toast } from './ui.js';
   // 年份
   const y = document.getElementById("year");
   if (y) y.textContent = new Date().getFullYear();
-  
-      // ===== helper =====
+
+  // ===== helpers =====
   async function loadJSON(path){
     const u = url(path);
     try{
@@ -38,8 +35,17 @@ import { sheet, toast } from './ui.js';
       return null;
     }
   }
-  function el(tag, cls, html){ const x=document.createElement(tag); if(cls) x.className=cls; if(html!=null) x.innerHTML=html; return x; }
-  function mapLink(loc, addr){ if(loc?.lat && loc?.lng) return `https://www.google.com/maps?q=${loc.lat},${loc.lng}`; if(addr) return `https://www.google.com/maps?q=${encodeURIComponent(addr)}`; return null; }
+  function el(tag, cls, html){
+    const x = document.createElement(tag);
+    if(cls) x.className = cls;
+    if(html != null) x.innerHTML = html;
+    return x;
+  }
+  function mapLink(loc, addr){
+    if(loc?.lat && loc?.lng) return `https://www.google.com/maps?q=${loc.lat},${loc.lng}`;
+    if(addr) return `https://www.google.com/maps?q=${encodeURIComponent(addr)}`;
+    return null;
+  }
 
   // ===== Quick chips =====
   const QUICK = [
@@ -55,12 +61,12 @@ import { sheet, toast } from './ui.js';
   QUICK.forEach(q=>{
     const a = el("a","chip",q.label);
     a.href = url(`places.html#?tags=${encodeURIComponent(q.tags.join(","))}`);
-    qc.appendChild(a);
+    qc?.appendChild(a);
   });
 
   // ===== 載入 divisions + merchants =====
   const cities = await loadJSON('data/cities.json');
-  const divisionIds = (cities?.divisions || []).map(d=>d.id);
+  const divisionIds = (cities?.divisions || []).map(d=>d.id) || [];
 
   let ALL = [];
   for (const id of divisionIds){
@@ -70,7 +76,8 @@ import { sheet, toast } from './ui.js';
 
   // ===== Hero rail =====
   function renderHero(items){
-    const rail = $("#heroRail"); rail.innerHTML = "";
+    const rail = $("#heroRail"); if (!rail) return;
+    rail.innerHTML = "";
     items.forEach(it=>{
       const card = el("a","hero-card",`
         <img src="${url(it.image)}" alt="">
@@ -121,7 +128,7 @@ import { sheet, toast } from './ui.js';
   }
 
   function renderRow(rowDef){
-    const host = $("#rowsHost");
+    const host = $("#rowsHost"); if (!host) return;
     const sec = el("section","row-section");
     const head = el("div","row-head",`
       <h2>${rowDef.title || ""}</h2>
@@ -191,129 +198,135 @@ import { sheet, toast } from './ui.js';
   function getFavs(){ try{ return new Set(JSON.parse(localStorage.getItem(FAV_KEY)||"[]")); }catch{ return new Set(); } }
   function saveFavs(s){ localStorage.setItem(FAV_KEY, JSON.stringify([...s])); }
   function toggleFavorite(id){ const s=getFavs(); s.has(id)? s.delete(id): s.add(id); saveFavs(s); }
-  function updateFavButton(id){ const s=getFavs(); const btn=$("#actFav"); if(!btn) return; btn.innerHTML = s.has(id) ? "❤️ <span>Favorited</span>" : "🤍 <span>Favorite</span>"; }
+  function updateFavButton(id){
+    const s=getFavs();
+    const btn=$("#actFav"); if(!btn) return;
+    btn.innerHTML = s.has(id) ? "❤️ <span>Favorited</span>" : "🤍 <span>Favorite</span>";
+  }
 
-// ===== TikTok-style Fullscreen Search =====
-const overlay    = document.getElementById('searchOverlay');
-const inputEl    = document.getElementById('overlayInput');
-const listEl     = document.getElementById('overlayList');
-const hintEl     = document.getElementById('searchHint');
-const btnOpen    = document.getElementById('btnSearch');
-const btnClose   = document.getElementById('overlayClose');
+  // ===== TikTok-style Fullscreen Search =====
+  const overlay    = document.getElementById('searchOverlay');
+  const inputEl    = document.getElementById('overlayInput');
+  const listEl     = document.getElementById('overlayList');
+  const hintEl     = document.getElementById('searchHint');
+  const btnOpen    = document.getElementById('btnSearch');
+  const btnClose   = document.getElementById('overlayClose');
+  const clearBtn   = document.getElementById('searchClear');
 
-let _lockY = 0;
-function lockScroll(){
-  _lockY = window.scrollY || document.documentElement.scrollTop || 0;
-  document.documentElement.style.setProperty('--lock-top', `-${_lockY}px`);
-  document.body.style.setProperty('--lock-top', `-${_lockY}px`);
-  document.body.classList.add('search-lock');     // 真正鎖住背景頁
-}
-function unlockScroll(){
-  document.body.classList.remove('search-lock');
-  document.body.style.removeProperty('--lock-top');
-  document.documentElement.style.removeProperty('--lock-top');
-  window.scrollTo(0, _lockY || 0);
-}
+  let _lockY = 0;
+  function lockScroll(){
+    _lockY = window.scrollY || document.documentElement.scrollTop || 0;
+    document.documentElement.style.setProperty('--lock-top', `-${_lockY}px`);
+    document.body.style.setProperty('--lock-top', `-${_lockY}px`);
+    document.body.classList.add('search-lock'); // 真正鎖住背景頁
+  }
+  function unlockScroll(){
+    document.body.classList.remove('search-lock');
+    document.body.style.removeProperty('--lock-top');
+    document.documentElement.style.removeProperty('--lock-top');
+    window.scrollTo(0, _lockY || 0);
+  }
 
-function openSearch(){
-  if (!overlay) return;
-  overlay.hidden = false;
-  requestAnimationFrame(()=> overlay.classList.add('active'));
-  lockScroll();
-  if (inputEl){
+  function openSearch(){
+    if (!overlay) return;
+    overlay.hidden = false;
+    requestAnimationFrame(()=> overlay.classList.add('active'));
+    lockScroll();
+    if (inputEl){
+      inputEl.value = '';
+      inputEl.focus();
+    }
+    if (listEl) listEl.innerHTML = '';
+    if (hintEl) hintEl.textContent = 'Popular: seafood · museum · beach';
+  }
+  function closeSearch(){
+    if (!overlay) return;
+    overlay.classList.remove('active');
+    setTimeout(()=> overlay.hidden = true, 250);
+    unlockScroll();
+  }
+
+  btnOpen?.addEventListener('click', openSearch);
+  btnClose?.addEventListener('click', closeSearch);
+  overlay?.addEventListener('click', (e)=>{
+    // 點擊背景（非內容）關閉
+    if (e.target === overlay) closeSearch();
+  });
+  window.addEventListener('keydown', e=>{ if (e.key === 'Escape') closeSearch(); });
+
+  // 搜尋函式（打分）
+  function searchMerchants(q){
+    if (!q) return [];
+    const s = q.trim().toLowerCase();
+    const score = (m) => {
+      let sc = 0;
+      const name = (m.name||'').toLowerCase();
+      const desc = (m.description||'').toLowerCase();
+      if (name.startsWith(s)) sc += 6;
+      if (name.includes(s))  sc += 3;
+      if (desc.includes(s))  sc += 2;
+      if ((m.tagIds||[]).some(t => String(t).toLowerCase().includes(s))) sc += 1;
+      return sc;
+    };
+    return [...ALL]
+      .map(m => [score(m), m])
+      .filter(([sc]) => sc > 0)
+      .sort((a,b)=> b[0]-a[0])
+      .slice(0, 50)
+      .map(([,m])=>m);
+  }
+
+  // 渲染（白底列表＋序號＋白線分隔）
+  function renderSearchList(list){
+    if (!listEl) return;
+    listEl.innerHTML = '';
+
+    if (!list.length){
+      if (hintEl) hintEl.textContent = 'No results. Try another keyword.';
+      return;
+    }
+    if (hintEl) hintEl.textContent = `Results · ${list.length}`;
+
+    list.forEach((m, i)=>{
+      const row = document.createElement('button');
+      row.className = 'search-item';
+      row.type = 'button';
+      row.innerHTML = `
+        <div class="search-index">${i+1}</div>
+        <div class="search-thumb" style="background-image:url('${m.cover}')"></div>
+        <div class="search-main">
+          <div class="search-title">${m.name}</div>
+          <div class="search-sub">${m.address || ''}</div>
+          <div class="search-tags">${(m.tagIds||[]).join(' · ')}</div>
+        </div>
+        <div class="search-meta">${m.rating ?? ''}${m.priceLevel ? ` · ${'💲'.repeat(m.priceLevel)}` : ''}</div>
+      `;
+      row.addEventListener('click', ()=>{ closeSearch(); openModal(m); });
+      listEl.appendChild(row);
+    });
+  }
+
+  // 即時輸入（防抖）
+  let _tmr = null;
+  inputEl?.addEventListener('input', (e)=>{
+    clearTimeout(_tmr);
+    const q = e.target.value;
+    _tmr = setTimeout(()=> renderSearchList(searchMerchants(q)), 120);
+  });
+
+  // 初次聚焦：清空結果
+  inputEl?.addEventListener('focus', ()=>{
+    if (listEl) listEl.innerHTML = '';
+  });
+
+  // 清除輸入
+  clearBtn?.addEventListener('click', ()=>{
+    if (!inputEl) return;
     inputEl.value = '';
     inputEl.focus();
-  }
-  if (listEl) listEl.innerHTML = '';
-  if (hintEl) hintEl.textContent = 'Popular: seafood · museum · beach';
-}
-function closeSearch(){
-  if (!overlay) return;
-  overlay.classList.remove('active');
-  setTimeout(()=> overlay.hidden = true, 250);
-  unlockScroll();
-}
-
-btnOpen?.addEventListener('click', openSearch);
-btnClose?.addEventListener('click', closeSearch);
-overlay?.addEventListener('click', (e)=>{
-  // 點擊黑玻璃空白處關閉（不影響內容捲動）
-  const isBackdrop = e.target === overlay;
-  if (isBackdrop) closeSearch();
-});
-window.addEventListener('keydown', e=>{ if (e.key === 'Escape') closeSearch(); });
-
-// 搜尋函式：沿用你打分策略
-function searchMerchants(q){
-  if (!q) return [];
-  const s = q.trim().toLowerCase();
-  const score = (m) => {
-    let sc = 0;
-    const name = (m.name||'').toLowerCase();
-    const desc = (m.description||'').toLowerCase();
-    if (name.startsWith(s)) sc += 6;
-    if (name.includes(s))  sc += 3;
-    if (desc.includes(s))  sc += 2;
-    if ((m.tagIds||[]).some(t => String(t).toLowerCase().includes(s))) sc += 1;
-    return sc;
-  };
-  return [...ALL]
-    .map(m => [score(m), m])
-    .filter(([sc]) => sc > 0)
-    .sort((a,b)=> b[0]-a[0])
-    .slice(0, 50)
-    .map(([,m])=>m);
-}
-
-// 渲染：整頁一行一筆（使用 .search-item 樣式）
-function renderSearchList(list){
-  if (!listEl) return;
-  listEl.innerHTML = '';
-  if (!list.length){
-    if (hintEl) hintEl.textContent = 'No results. Try another keyword.';
-    return;
-  }
-  if (hintEl) hintEl.textContent = `Results · ${list.length}`;
-
-  list.forEach(m=>{
-    const row = document.createElement('button');
-    row.className = 'search-item';
-    row.type = 'button';
-    row.innerHTML = `
-      <div class="search-thumb" style="background-image:url('${m.cover}')"></div>
-      <div class="search-main">
-        <div class="search-title">${m.name}</div>
-        <div class="search-sub">${m.address || ''}</div>
-        <div class="search-tags">${(m.tagIds||[]).join(' · ')}</div>
-      </div>
-      <div class="search-meta">
-        ${m.rating ? `⭐ ${m.rating}` : ''} ${m.priceLevel ? ` · ${'💲'.repeat(m.priceLevel)}` : ''}
-      </div>
-    `;
-    row.addEventListener('click', ()=>{ closeSearch(); openModal(m); });
-    listEl.appendChild(row);
+    if (hintEl) hintEl.textContent = 'Popular: seafood · museum · beach';
+    renderSearchList([]);
   });
-}
-
-// 即時輸入（防抖）
-let _tmr = null;
-inputEl?.addEventListener('input', (e)=>{
-  clearTimeout(_tmr);
-  const q = e.target.value;
-  _tmr = setTimeout(()=> renderSearchList(searchMerchants(q)), 120);
-});
-
-// 初次打開：清空結果
-inputEl?.addEventListener('focus', ()=>{
-  if (listEl) listEl.innerHTML = '';
-});
-
-const clearBtn = document.getElementById('searchClear');
-clearBtn?.addEventListener('click', ()=>{
-  field.value = '';
-  field.focus();
-  renderResults([]); // 或顯示熱門/提示
-});
 
   // ===== collections → render =====
   const collections = await loadJSON('data/collections.json');
