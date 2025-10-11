@@ -204,54 +204,101 @@ import { sheet, toast } from './ui.js';
     btn.innerHTML = s.has(id) ? "❤️ <span>Favorited</span>" : "🤍 <span>Favorite</span>";
   }
 
-  // ===== TikTok-style Fullscreen Search =====
-  const overlay    = document.getElementById('searchOverlay');
-  const inputEl    = document.getElementById('overlayInput');
-  const listEl     = document.getElementById('overlayList');
-  const hintEl     = document.getElementById('searchHint');
-  const btnOpen    = document.getElementById('btnSearch');
-  const btnClose   = document.getElementById('overlayClose');
-  const clearBtn   = document.getElementById('searchClear');
+  // ===== TikTok-style Fullscreen Search — hardened scroll lock =====
+const overlay    = document.getElementById('searchOverlay');
+const inputEl    = document.getElementById('overlayInput');
+const listEl     = document.getElementById('overlayList');
+const hintEl     = document.getElementById('searchHint');
+const btnOpen    = document.getElementById('btnSearch');
+const btnClose   = document.getElementById('overlayClose');
+const clearBtn   = document.getElementById('searchClear');
 
-  let _lockY = 0;
-  function lockScroll(){
-    _lockY = window.scrollY || document.documentElement.scrollTop || 0;
-    document.documentElement.style.setProperty('--lock-top', `-${_lockY}px`);
-    document.body.style.setProperty('--lock-top', `-${_lockY}px`);
-    document.body.classList.add('search-lock'); // 真正鎖住背景頁
-  }
-  function unlockScroll(){
-    document.body.classList.remove('search-lock');
-    document.body.style.removeProperty('--lock-top');
-    document.documentElement.style.removeProperty('--lock-top');
-    window.scrollTo(0, _lockY || 0);
-  }
+// 只有這個容器允許垂直滾動
+const scrollArea = document.querySelector('#searchOverlay .search-scroll');
 
-  function openSearch(){
-    if (!overlay) return;
-    overlay.hidden = false;
-    requestAnimationFrame(()=> overlay.classList.add('active'));
-    lockScroll();
-    if (inputEl){
-      inputEl.value = '';
-      inputEl.focus();
-    }
-    if (listEl) listEl.innerHTML = '';
-    if (hintEl) hintEl.textContent = 'Popular: seafood · museum · beach';
-  }
-  function closeSearch(){
-    if (!overlay) return;
-    overlay.classList.remove('active');
-    setTimeout(()=> overlay.hidden = true, 250);
-    unlockScroll();
-  }
+let _lockY = 0;
+function lockScroll(){
+  _lockY = window.scrollY || document.documentElement.scrollTop || 0;
+  document.documentElement.style.setProperty('--lock-top', `-${_lockY}px`);
+  document.body.style.setProperty('--lock-top', `-${_lockY}px`);
+  document.body.classList.add('search-lock');   // 鎖住背景頁
+}
+function unlockScroll(){
+  document.body.classList.remove('search-lock');
+  document.body.style.removeProperty('--lock-top');
+  document.documentElement.style.removeProperty('--lock-top');
+  window.scrollTo(0, _lockY || 0);
+}
 
-  btnOpen?.addEventListener('click', openSearch);
-  btnClose?.addEventListener('click', closeSearch);
-  overlay?.addEventListener('click', (e)=>{
-    // 點擊背景（非內容）關閉
-    if (e.target === overlay) closeSearch();
-  });
+// 桌面：到頂/到底時阻止滾輪事件冒泡到 body
+function onOverlayWheel(e){
+  if (!scrollArea) return;
+  const delta = e.deltaY;
+  const atTop = scrollArea.scrollTop <= 0;
+  const atBottom = Math.ceil(scrollArea.scrollTop + scrollArea.clientHeight) >= scrollArea.scrollHeight;
+  const goingUp = delta < 0;
+  const goingDown = delta > 0;
+  if ((atTop && goingUp) || (atBottom && goingDown)) {
+    e.preventDefault();
+  }
+}
+
+// 行動：只有在清單內才允許滾動，點在玻璃上阻擋（避免拖到首頁）
+function onOverlayTouchMove(e){
+  if (!scrollArea) return;
+  if (!scrollArea.contains(e.target)) {
+    e.preventDefault();
+  }
+}
+
+function openSearch(){
+  if (!overlay) return;
+  overlay.hidden = false;
+  requestAnimationFrame(()=> overlay.classList.add('active'));
+  lockScroll();
+
+  if (inputEl){
+    inputEl.value = '';
+    inputEl.focus();
+  }
+  if (listEl) listEl.innerHTML = '';
+  if (hintEl) hintEl.textContent = 'Popular: seafood · museum · beach';
+
+  // 啟用攔截
+  overlay.addEventListener('wheel', onOverlayWheel, { passive: false });
+  overlay.addEventListener('touchmove', onOverlayTouchMove, { passive: false });
+}
+
+function closeSearch(){
+  if (!overlay) return;
+  overlay.classList.remove('active');
+  setTimeout(()=> overlay.hidden = true, 250);
+  unlockScroll();
+
+  // 移除監聽
+  overlay.removeEventListener('wheel', onOverlayWheel);
+  overlay.removeEventListener('touchmove', onOverlayTouchMove);
+}
+
+btnOpen?.addEventListener('click', openSearch);
+btnClose?.addEventListener('click', closeSearch);
+
+// 點玻璃背景才關閉（清單內可滾動）
+overlay?.addEventListener('click', (e)=>{
+  if (e.target === overlay) closeSearch();
+});
+
+// Esc 關閉
+window.addEventListener('keydown', e=>{ if (e.key === 'Escape') closeSearch(); });
+
+// Clear 按鈕：清空文字＋回到熱門提示
+clearBtn?.addEventListener('click', ()=>{
+  if (!inputEl) return;
+  inputEl.value = '';
+  inputEl.focus();
+  if (listEl) listEl.innerHTML = '';
+  if (hintEl) hintEl.textContent = 'Popular: seafood · museum · beach';
+});
   window.addEventListener('keydown', e=>{ if (e.key === 'Escape') closeSearch(); });
 
   // 搜尋函式（打分）
