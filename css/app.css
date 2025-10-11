@@ -465,6 +465,7 @@ a{color:inherit;text-decoration:none}
 .search-title{
   font-weight:800; font-size:17px; line-height:1.2;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  color:white;
 }
 
 /* 次行 / 標籤各 1 行，超出省略 */
