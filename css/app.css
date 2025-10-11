@@ -310,7 +310,7 @@ body.search-lock{
   content:"";
   position:absolute; left:50%; transform:translateX(-50%);
   bottom: calc(8px + env(safe-area-inset-bottom));
-  width: min(92%, 300px);
+  width: 300px;
   height: 56px;
   border-radius: 30px;
   background: color-mix(in srgb, #ffffff 86%, transparent);
