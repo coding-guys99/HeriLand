@@ -308,6 +308,13 @@ inputEl?.addEventListener('focus', ()=>{
   if (listEl) listEl.innerHTML = '';
 });
 
+const clearBtn = document.getElementById('searchClear');
+clearBtn?.addEventListener('click', ()=>{
+  field.value = '';
+  field.focus();
+  renderResults([]); // 或顯示熱門/提示
+});
+
   // ===== collections → render =====
   const collections = await loadJSON('data/collections.json');
   const rows = collections?.rows || [];
