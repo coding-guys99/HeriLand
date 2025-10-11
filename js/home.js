@@ -272,6 +272,13 @@ function closeOverlay(){
   window.visualViewport?.removeEventListener('scroll', positionAnchors);
 }
 
+// 只允許 overlayResults 直向捲動，其它地方禁止捲動
+overlay?.addEventListener('touchmove', (e)=>{
+  if (!resultsEl.contains(e.target)) {
+    e.preventDefault();
+  }
+}, { passive: false });
+
 // 點背景（非結果面板）關閉
 overlay?.addEventListener('click', (e)=>{
   if (e.target === overlay) closeOverlay();
