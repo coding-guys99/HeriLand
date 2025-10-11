@@ -748,3 +748,22 @@ body.searching #overlayClose{
   top:  calc(var(--pill-top, 12px) + 2px);
   right: 12px;
 }
+
+/* 搜尋中鎖捲動：把 body 固定在原位 */
+body.search-lock{
+  position: fixed;
+  left: 0; right: 0;
+  width: 100%;
+  top: var(--lock-top, 0);   /* 由 JS 寫入負的 scrollY */
+  overflow: hidden;
+}
+
+/* 覆蓋觸控：整個 overlay 預設不處理滾動 */
+.overlay-glass{ overscroll-behavior: contain; touch-action: none; }
+
+/* 只有結果面板可以直向滾動 */
+.overlay-results{
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
