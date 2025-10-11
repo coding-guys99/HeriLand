@@ -10,16 +10,18 @@
 <body class="mobile-app">
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <!-- AppBar（左 Logo、右通知，中間玻璃搜尋膠囊） -->
+  <!-- AppBar（左 Logo、右通知，中間搜尋觸發膠囊） -->
   <header class="appbar" role="banner">
     <div class="appbar-inner">
       <a class="brand" href="index.html" aria-label="HeriLand">
         <img src="assets/logo.svg" alt="" class="brand-mark"/>
       </a>
-      <!-- Search pill（仍在原本 hero/toolbar 位置） -->
-<div class="search-pill" id="searchPill">
-  🔍 <input id="searchField" type="search" placeholder="Search: seafood, museum, beach…" autocomplete="off"/>
-</div>
+
+      <!-- 搜尋膠囊：改為觸發按鈕，輸入框移到 overlay 裡 -->
+      <button class="search-pill" id="searchPill" type="button" aria-haspopup="dialog">
+        🔍 <span class="placeholder">Search: seafood, museum, beach…</span>
+      </button>
+
       <button class="icon-btn" aria-label="Notifications">🔔</button>
     </div>
   </header>
@@ -41,23 +43,32 @@
 
     <!-- 動態 Rows（如 Netflix） -->
     <section class="rows" id="rowsHost">
-      <!-- 由 JS 依 collections.json 插入：
-           - Top Picks（poster-row）
-           - Recently Updated（mini-row）
-           - By Division（division-row）
-           - Theme rows（poster-row） -->
+      <!-- 由 JS 依 collections.json 插入各 row -->
     </section>
   </main>
-  
-<!-- Fullscreen glass backdrop + anchored results -->
-<div id="searchOverlay" class="overlay-glass" hidden>
-  <div id="overlayResults" class="overlay-results" role="list"></div>
-  <button id="overlayClose" class="overlay-close" aria-label="Close">Cancel</button>
-</div>
 
+  <!-- ===== Fullscreen Glass Search（整頁、可滾動的結果） ===== -->
+  <div id="searchOverlay" class="overlay-glass" hidden aria-hidden="true" role="dialog" aria-modal="true">
+    <!-- 固定頂部：搜尋輸入 + Cancel -->
+    <div class="overlay-header" role="search">
+      <label class="search-pill" for="searchField">
+        <span class="icon">🔍</span>
+        <input id="searchField"
+               type="search"
+               placeholder="Search places, food, nature…"
+               enterkeyhint="search"
+               autocomplete="off"/>
+      </label>
+      <button id="overlayClose" class="btn-cancel" type="button">Cancel</button>
+    </div>
 
+    <!-- 整頁可捲動的結果區 -->
+    <div class="overlay-scroll" id="overlayResults" role="list">
+      <!-- JS 會把 .result-item 動態插入 -->
+    </div>
+  </div>
 
-  <!-- Place Detail Modal（沿用你的抽屜） -->
+  <!-- Place Detail Modal -->
   <div class="modal-backdrop" id="placeModal" hidden aria-hidden="true">
     <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="placeTitle">
       <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
@@ -91,10 +102,10 @@
   <!-- 共用底部導航（partial 注入） -->
   <div data-include="partials/tabbar.html"></div>
 
-<script type="module" src="js/ui.js"></script>
+  <!-- Scripts -->
+  <script type="module" src="js/ui.js"></script>
   <script src="js/include.js" defer></script>
   <script src="js/nav.js" defer></script>
-  <!-- 用 home.js（新首頁邏輯），取代原本 app.js -->
   <script type="module" src="js/home.js" defer></script>
 </body>
 </html>
