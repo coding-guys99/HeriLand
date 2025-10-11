@@ -352,3 +352,21 @@ body.search-lock{
 .card.is-loading .body{ padding:12px }
 .card.is-loading h3{ height:16px; width:70%; margin:8px 0; background:#eee }
 .card.is-loading .meta{ height:14px; width:50%; background:#eee; border-radius:8px }
+
+/* AppBar：左側問候、右側搜尋 icon */
+.greet{ display:flex; flex-direction:column; line-height:1; }
+.greet strong{ font-weight:800; letter-spacing:.2px; }
+.greet .sub{ font-size:12px; color:var(--muted); }
+
+.search-trigger{ font-size:20px; line-height:1; }
+
+/* 覆蓋：抖音式全頁搜尋 → 結果用整頁 */
+#searchOverlay .overlay-results{ display:none; } /* 舊結構保險關閉 */
+#searchOverlay .search-bar{ position: sticky; top:0; z-index:1; }
+#searchOverlay .search-scroll{
+  height: calc(100vh - 56px - env(safe-area-inset-bottom));
+  overflow:auto;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+
+/* 結果行樣式沿用你 .search-item（已存在） */
