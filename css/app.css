@@ -390,3 +390,29 @@ body.search-lock{
   .search-tags{ color:#aeb7bf !important; }
   .search-meta{ color:#fff !important; }
 }
+
+/* === Search Cancel Button Contrast Fix === */
+.search-cancel {
+  color: #2E5E4E !important;   /* 改成主題綠，與玻璃白區分 */
+  font-weight: 700;
+  letter-spacing: .2px;
+  background: transparent;
+  text-shadow: 0 0 6px rgba(255,255,255,.6); /* 在亮底時略提亮邊緣 */
+  padding: 8px 6px;
+  cursor: pointer;
+  transition: color .2s ease, opacity .2s ease;
+}
+.search-cancel:hover {
+  opacity: .8;
+}
+.search-cancel:active {
+  opacity: .6;
+}
+
+/* 暗色模式下改為偏金白，避免太暗 */
+@media (prefers-color-scheme: dark){
+  .search-cancel {
+    color: #E4C77D !important;  /* 用金色系呼應品牌 */
+    text-shadow: 0 0 6px rgba(0,0,0,.4);
+  }
+}
