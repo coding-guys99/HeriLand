@@ -191,68 +191,78 @@ import { sheet, toast } from './ui.js';
   function toggleFavorite(id){ const s=getFavs(); s.has(id)? s.delete(id): s.add(id); saveFavs(s); }
   function updateFavButton(id){ const s=getFavs(); const btn=$("#actFav"); if(!btn) return; btn.innerHTML = s.has(id) ? "❤️ <span>Favorited</span>" : "🤍 <span>Favorite</span>"; }
 
-  // ===== Search Sheet integration（搬進 IIFE，能取用 ALL / openModal） =====
-  document.getElementById('btnSearch')?.addEventListener('click', () => {
-    sheet.open('sheetSearch');
-    const ipt = document.getElementById('searchInput');
-    const rail = document.getElementById('searchRail');
-    const hint = document.getElementById('searchHint');
-    if (ipt) { ipt.value = ''; ipt.focus(); }
-    if (rail) rail.innerHTML = '';
-    if (hint) hint.textContent = 'Type to search places. Showing top matches.';
-  });
-  document.getElementById('btnSearchClose')?.addEventListener('click', () => sheet.close());
-  sheet.bindBackdrop('sheetSearch');
+  // ===== Fullscreen Glass Search =====
+const openSearch = () => {
+  sheet.open('sheetSearch');
+  const ipt  = document.getElementById('searchInput');
+  const list = document.getElementById('searchList');
+  const hint = document.getElementById('searchHint');
+  if (ipt)  { ipt.value=''; ipt.focus(); }
+  if (list) list.innerHTML='';
+  if (hint) hint.textContent = 'Popular: seafood · museum · beach';
+};
+document.getElementById('btnSearch')?.addEventListener('click', openSearch);
+document.getElementById('btnSearchClose')?.addEventListener('click', () => sheet.close());
+window.addEventListener('keydown', e=>{ if(e.key==='Escape') sheet.close(); });
 
-  function searchMerchants(q){
-    if (!q) return [];
-    const s = q.trim().toLowerCase();
-    const score = (m) => {
-      let sc = 0;
-      if (m.name?.toLowerCase().startsWith(s)) sc += 5;
-      if (m.name?.toLowerCase().includes(s))  sc += 3;
-      if (m.description?.toLowerCase().includes(s)) sc += 2;
-      if ((m.tagIds||[]).some(t => String(t).toLowerCase().includes(s))) sc += 1;
-      return sc;
-    };
-    return [...ALL]
-      .map(m => [score(m), m])
-      .filter(([sc]) => sc>0)
-      .sort((a,b)=>b[0]-a[0])
-      .slice(0,12)
-      .map(([,m])=>m);
+function searchMerchants(q){
+  if (!q) return [];
+  const s = q.trim().toLowerCase();
+  const score = (m) => {
+    let sc = 0;
+    const name = m.name?.toLowerCase() || '';
+    const desc = m.description?.toLowerCase() || '';
+    if (name.startsWith(s)) sc += 6;
+    if (name.includes(s))  sc += 3;
+    if (desc.includes(s))  sc += 2;
+    if ((m.tagIds||[]).some(t => String(t).toLowerCase().includes(s))) sc += 1;
+    return sc;
+  };
+  return [...ALL]
+    .map(m => [score(m), m])
+    .filter(([sc]) => sc>0)
+    .sort((a,b)=>b[0]-a[0])
+    .slice(0, 30)
+    .map(([,m])=>m);
+}
+
+function renderSearchResults(listData){
+  const list = document.getElementById('searchList');
+  const hint = document.getElementById('searchHint');
+  list.innerHTML = '';
+
+  if (!listData.length){
+    if (hint) hint.textContent = 'No results. Try another keyword.';
+    return;
   }
+  if (hint) hint.textContent = `Results · ${listData.length}`;
 
-  function renderSearchResults(list){
-    const rail = document.getElementById('searchRail');
-    const hint = document.getElementById('searchHint');
-    rail.innerHTML = '';
-    if (!list.length){
-      if (hint) hint.textContent = 'No results. Try another keyword.';
-      return;
-    }
-    if (hint) hint.textContent = `Top results · ${list.length}`;
-    list.forEach(m => {
-      const card = document.createElement('article');
-      card.className = 'card mini';
-      card.innerHTML = `
-        <div class="thumb" style="background-image:url('${m.cover}')"></div>
-        <div class="meta"><span>⭐ ${m.rating ?? '-'}</span></div>
-      `;
-      card.addEventListener('click', () => {
-        sheet.close();
-        openModal(m);
-      });
-      rail.appendChild(card);
-    });
-  }
-
-  let tmr=null;
-  document.getElementById('searchInput')?.addEventListener('input', (e) => {
-    clearTimeout(tmr);
-    const q = e.target.value;
-    tmr = setTimeout(()=> renderSearchResults(searchMerchants(q)), 120);
+  listData.forEach(m => {
+    const row = document.createElement('button');
+    row.className = 'search-item';
+    row.type = 'button';
+    row.innerHTML = `
+      <div class="search-thumb" style="background-image:url('${m.cover}')"></div>
+      <div class="search-main">
+        <div class="search-title">${m.name}</div>
+        <div class="search-sub">${m.address || ''}</div>
+        <div class="search-tags">${(m.tagIds||[]).join(' · ')}</div>
+      </div>
+      <div class="search-meta">
+        ${m.rating ? `⭐ ${m.rating}` : ''} ${m.priceLevel ? ` · ${'💲'.repeat(m.priceLevel)}` : ''}
+      </div>
+    `;
+    row.addEventListener('click', () => { sheet.close(); openModal(m); });
+    list.appendChild(row);
   });
+}
+
+let tmr=null;
+document.getElementById('searchInput')?.addEventListener('input', (e) => {
+  clearTimeout(tmr);
+  const q = e.target.value;
+  tmr = setTimeout(()=> renderSearchResults(searchMerchants(q)), 120);
+});
 
   // ── collections → render
   const collections = await loadJSON('data/collections.json');
