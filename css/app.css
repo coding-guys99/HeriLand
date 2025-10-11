@@ -436,3 +436,42 @@ a{color:inherit;text-decoration:none}
   .search-tags{ color:#aeb7bf }
   .search-meta{ color:#e7edf2 }
 }
+
+/* 固定每列高度 —— 手機一致 */
+:root{ --sr-row-h: 96px; } /* 想更矮改這裡：88/92/96 皆可 */
+
+.search-item{
+  display:grid;
+  grid-template-columns: 96px 1fr 64px;   /* 縮圖 / 文案 / 評分 */
+  align-items:center;
+  height: var(--sr-row-h);                /* ← 固定高度 */
+  padding: 14px 14px 12px;
+  margin: 10px 12px;
+  border-radius:16px;
+}
+
+/* 縮圖固定尺寸 */
+.search-thumb{ width:96px; height:72px; border-radius:14px; }
+
+/* 文案容器用內部定位，不讓它把行高撐開 */
+.search-main{
+  min-width:0; display:flex; flex-direction:column; justify-content:center; gap:4px;
+  /* 限制可占空間，避免撐高 */
+  max-height: calc(var(--sr-row-h) - 28px);  /* 28 = 上下 padding 近似 */
+  overflow:hidden;
+}
+
+/* 標題限制 1 行（最穩定），超出省略 */
+.search-title{
+  font-weight:800; font-size:17px; line-height:1.2;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+/* 次行 / 標籤各 1 行，超出省略 */
+.search-sub, .search-tags{
+  font-size:12px; line-height:1.2; color:#51606d;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+/* 右側評分寬度固定 */
+.search-meta{ width:64px; justify-content:flex-end; }
