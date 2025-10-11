@@ -17,8 +17,8 @@
         <img src="assets/logo.svg" alt="" class="brand-mark"/>
       </a>
 
-      <!-- 搜尋膠囊：改為觸發按鈕，輸入框移到 overlay 裡 -->
-      <button class="search-pill" id="searchPill" type="button" aria-haspopup="dialog">
+      <!-- 🔍 搜尋觸發膠囊 -->
+      <button class="search-pill" id="searchPill" type="button">
         🔍 <span class="placeholder">Search: seafood, museum, beach…</span>
       </button>
 
@@ -27,48 +27,30 @@
   </header>
 
   <main id="main">
-    <!-- Hero Rail（可放廣告/活動，低矮輪播） -->
+    <!-- Hero Rail -->
     <section class="hero-rail" aria-label="Highlights">
       <div class="rail" id="heroRail" role="list"></div>
     </section>
 
-    <!-- 快速 Chips（跳 Explore 並套好篩選） -->
+    <!-- 快速 Chips -->
     <section class="section">
       <div class="container">
-        <div class="chips-row" id="quickChips" role="list">
-          <!-- 由 JS 插入 Taste / Culture / Nature / Stay / Local / Experience / Modern -->
-        </div>
+        <div class="chips-row" id="quickChips" role="list"></div>
       </div>
     </section>
 
-    <!-- 動態 Rows（如 Netflix） -->
-    <section class="rows" id="rowsHost">
-      <!-- 由 JS 依 collections.json 插入各 row -->
-    </section>
+    <!-- 動態 Rows -->
+    <section class="rows" id="rowsHost"></section>
   </main>
 
-  <!-- ===== Fullscreen Glass Search（整頁、可滾動的結果） ===== -->
-  <div id="searchOverlay" class="overlay-glass" hidden aria-hidden="true" role="dialog" aria-modal="true">
-    <!-- 固定頂部：搜尋輸入 + Cancel -->
-    <div class="overlay-header" role="search">
-      <label class="search-pill" for="searchField">
-        <span class="icon">🔍</span>
-        <input id="searchField"
-               type="search"
-               placeholder="Search places, food, nature…"
-               enterkeyhint="search"
-               autocomplete="off"/>
-      </label>
-      <button id="overlayClose" class="btn-cancel" type="button">Cancel</button>
-    </div>
-
-    <!-- 整頁可捲動的結果區 -->
-    <div class="overlay-scroll" id="overlayResults" role="list">
-      <!-- JS 會把 .result-item 動態插入 -->
-    </div>
+  <!-- ===== Fullscreen Glass Search（整頁） ===== -->
+  <div id="searchOverlay" class="overlay-glass" hidden>
+    <!-- 由 JS 控制 .active / hidden -->
+    <div id="overlayResults" class="overlay-results" role="list"></div>
+    <button id="overlayClose" class="overlay-close" type="button">Cancel</button>
   </div>
 
-  <!-- Place Detail Modal -->
+  <!-- Modal（Place Detail） -->
   <div class="modal-backdrop" id="placeModal" hidden aria-hidden="true">
     <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="placeTitle">
       <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
@@ -99,7 +81,7 @@
     </div>
   </footer>
 
-  <!-- 共用底部導航（partial 注入） -->
+  <!-- 共用底部導航 -->
   <div data-include="partials/tabbar.html"></div>
 
   <!-- Scripts -->
