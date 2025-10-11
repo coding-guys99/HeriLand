@@ -1,295 +1,93 @@
-/* =========================================================
-   HeriLand — Home (rows-first)
-   - reads data/collections.json
-   - aggregates merchants from all divisions
-   - renders Netflix-like rows
-   - includes fullscreen glass search overlay
-   ========================================================= */
-import { sheet, toast } from './ui.js';
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>HeriLand — Discover Sarawak</title>
+  <meta name="description" content="Explore Sarawak like a local — culture, food, nature, and curated picks."/>
+  <link rel="stylesheet" href="css/app.css"/>
+</head>
+<body class="mobile-app">
+  <a class="skip-link" href="#main">Skip to content</a>
 
-(async () => {
-  const $ = s => document.querySelector(s);
+  <!-- AppBar（左 Logo、右通知，中間搜尋觸發膠囊） -->
+  <header class="appbar" role="banner">
+    <div class="appbar-inner">
+      <a class="brand" href="index.html" aria-label="HeriLand">
+        <img src="assets/logo.svg" alt="" class="brand-mark"/>
+      </a>
 
-  // ===== 基本設定 =====
-  const ROOT = '.';
-  const url = (p) => {
-    if (!p) return '#';
-    if (/^https?:\/\//i.test(p)) return p;
-    if (p.startsWith('/')) return `${ROOT}${p}`;
-    return `${ROOT}/${p.replace(/^\.\//,'')}`;
-  };
+      <!-- 🔍 搜尋膠囊：含真正的輸入框 -->
+<div class="search-pill" id="searchPill">
+  🔍 <input id="searchField" type="search" placeholder="Search: seafood, museum, beach…" autocomplete="off"/>
+</div>
 
-  // 年份
-  $("#year")?.textContent = new Date().getFullYear();
+      <button class="icon-btn" aria-label="Notifications">🔔</button>
+    </div>
+  </header>
 
-  // ===== helper =====
-  async function loadJSON(path){
-    const u = url(path);
-    try{
-      const r = await fetch(u);
-      if(!r.ok) throw new Error(`${r.status} ${u}`);
-      return await r.json();
-    }catch(e){
-      console.warn("[loadJSON]", u, e);
-      return null;
-    }
-  }
-  function el(tag, cls, html){ const x=document.createElement(tag); if(cls) x.className=cls; if(html!=null) x.innerHTML=html; return x; }
-  function mapLink(loc, addr){ if(loc?.lat && loc?.lng) return `https://www.google.com/maps?q=${loc.lat},${loc.lng}`; if(addr) return `https://www.google.com/maps?q=${encodeURIComponent(addr)}`; return null; }
+  <main id="main">
+    <!-- Hero Rail -->
+    <section class="hero-rail" aria-label="Highlights">
+      <div class="rail" id="heroRail" role="list"></div>
+    </section>
 
-  // ===== Quick chips =====
-  const QUICK = [
-    { label:"Taste",      tags:["food"] },
-    { label:"Culture",    tags:["culture","museum","temple"] },
-    { label:"Nature",     tags:["nature","park","waterfall","beach"] },
-    { label:"Stay",       tags:["stay","hotel"] },
-    { label:"Local",      tags:["local","market"] },
-    { label:"Experience", tags:["scenic","event","adventure","family"] },
-    { label:"Modern",     tags:["modern","shopping"] }
-  ];
-  const qc = $("#quickChips");
-  QUICK.forEach(q=>{
-    const a = el("a","chip",q.label);
-    a.href = url(`places.html#?tags=${encodeURIComponent(q.tags.join(","))}`);
-    qc.appendChild(a);
-  });
+    <!-- 快速 Chips -->
+    <section class="section">
+      <div class="container">
+        <div class="chips-row" id="quickChips" role="list"></div>
+      </div>
+    </section>
 
-  // ===== 載入 divisions + merchants =====
-  const cities = await loadJSON('data/cities.json');
-  const divisionIds = (cities?.divisions || []).map(d=>d.id);
+    <!-- 動態 Rows -->
+    <section class="rows" id="rowsHost"></section>
+  </main>
 
-  let ALL = [];
-  for (const id of divisionIds){
-    const data = await loadJSON(`data/merchants/${id}.json`);
-    if (data?.items) ALL.push(...data.items);
-  }
+  <!-- ===== Fullscreen Glass Search（整頁） ===== -->
+  <div id="searchOverlay" class="overlay-glass" hidden>
+    <!-- 由 JS 控制 .active / hidden -->
+    <div id="overlayResults" class="overlay-results" role="list"></div>
+    <button id="overlayClose" class="overlay-close" type="button">Cancel</button>
+  </div>
 
-  // ===== Hero rail =====
-  function renderHero(items){
-    const rail = $("#heroRail"); rail.innerHTML = "";
-    items.forEach(it=>{
-      const card = el("a","hero-card",`
-        <img src="${url(it.image)}" alt="">
-        <span class="hero-caption">
-          ${it.title} ${it.sponsored ? '<em class="ad">Ad</em>' : ''}
-        </span>
-      `);
-      card.href = url(it.url || "#");
-      rail.appendChild(card);
-    });
-  }
-
-  // ===== Rows =====
-  function cardPoster(m){
-    const a = el("article","card poster",`
-      <div class="thumb" style="background-image:url('${m.cover}')"></div>
-      <h3 class="t">${m.name}</h3>
-    `);
-    a.addEventListener("click", ()=> openModal(m));
-    return a;
-  }
-  function cardMini(m){
-    const a = el("article","card mini",`
-      <div class="thumb" style="background-image:url('${m.cover}')"></div>
-      <div class="meta"><span>⭐ ${m.rating ?? "-"}</span></div>
-    `);
-    a.addEventListener("click", ()=> openModal(m));
-    return a;
-  }
-  function divisionPill(d){
-    const a = el("a","division-pill",`<span>${d.name_en.replace(" Division","")}</span>`);
-    a.href = url(`places.html#/d/${d.id}`);
-    return a;
-  }
-
-  function filterBySource(src){
-    let arr = [...ALL];
-    if (src?.filter?.featured) arr = arr.filter(x=>x.featured);
-    if (src?.tags?.length) {
-      const set = new Set(src.tags.map(t=>String(t).toLowerCase()));
-      arr = arr.filter(x => (x.tagIds||[]).some(t => set.has(String(t).toLowerCase())));
-    }
-    if (src?.sort === "updatedAt:desc"){
-      arr.sort((a,b)=> new Date(b.updatedAt) - new Date(a.updatedAt));
-    }
-    if (src?.limit) arr = arr.slice(0, src.limit);
-    return arr;
-  }
-
-  function renderRow(rowDef){
-    const host = $("#rowsHost");
-    const sec = el("section","row-section");
-    const head = el("div","row-head",`
-      <h2>${rowDef.title || ""}</h2>
-      ${rowDef.type!=="division-row" ? `<a class="see-all" href="${url('places.html')}">See all</a>` : ''}
-    `);
-    const rail = el("div","rail");
-
-    if (rowDef.type === "poster-row"){
-      filterBySource(rowDef.source).forEach(m => rail.appendChild(cardPoster(m)));
-    } else if (rowDef.type === "mini-row"){
-      filterBySource(rowDef.source).forEach(m => rail.appendChild(cardMini(m)));
-    } else if (rowDef.type === "division-row"){
-      (cities?.divisions||[]).forEach(d => rail.appendChild(divisionPill(d)));
-    }
-
-    sec.appendChild(head);
-    sec.appendChild(rail);
-    host.appendChild(sec);
-  }
-
-  // ===== Modal（沿用） =====
-  const modal = $("#placeModal");
-  const modalCloseBtn = $("#modalClose");
-  function fillText(sel, text){ const e=$(sel); if(!e) return; e.textContent = text || ""; }
-  function action(el, href){ if(!el) return; if(href){ el.removeAttribute("disabled"); el.href=href; } else { el.setAttribute("disabled","true"); el.removeAttribute("href"); } }
-
-  function openModal(m){
-    const g = $("#modalGallery"); g.innerHTML = "";
-    (m.images?.length ? m.images : [m.cover]).forEach(src => { const i=new Image(); i.src=src; g.appendChild(i); });
-    fillText("#placeTitle", m.name);
-    $("#placeMeta").innerHTML = `
-      ${m.rating ? `<span>⭐ ${m.rating}</span>` : ""}
-      ${m.priceLevel ? `<span>${"💲".repeat(m.priceLevel)}</span>` : ""}
-    `;
-    fillText("#placeDesc", m.description);
-    fillText("#infoAddress", m.address);
-    fillText("#infoHours", m.openHours);
-    action($("#actCall"), m.phone ? `tel:${m.phone}` : null);
-    action($("#actWA"), m.whatsapp ? `https://wa.me/${m.whatsapp.replace(/\D/g,'')}` : null);
-    action($("#actWeb"), m.website || null);
-    action($("#actMap"), mapLink(m.location, m.address));
-
-    $("#actShare").onclick = async () => {
-      const shareUrl = `${location.origin}${location.pathname}#/p/${m.id}`;
-      if (navigator.share) { try{ await navigator.share({title:m.name, text:m.description||"", url: shareUrl}); }catch{} }
-      else { await navigator.clipboard?.writeText(shareUrl); alert("Link copied."); }
-    };
-    $("#actFav").onclick = () => { toggleFavorite(m.id); updateFavButton(m.id); };
-    updateFavButton(m.id);
-
-    modal.hidden = false; modal.setAttribute("aria-hidden","false"); document.body.style.overflow="hidden";
-    modalCloseBtn?.focus();
-    if (!location.hash.startsWith(`#/p/${m.id}`)) history.pushState(null,"",`#/p/${m.id}`);
-  }
-  function closeModal(){
-    if (modal.hidden) return;
-    modal.hidden = true; modal.setAttribute("aria-hidden","true"); document.body.style.overflow="";
-    if (location.hash.startsWith("#/p/")) history.pushState(null,"",location.pathname + location.search);
-  }
-  modalCloseBtn?.addEventListener("click", closeModal);
-  modal?.addEventListener("click", e=>{ if(e.target===modal) closeModal(); });
-  window.addEventListener("keydown", e=>{ if(e.key==="Escape") closeModal(); });
-  window.addEventListener("hashchange", ()=>{ const m = location.hash.match(/^#\/p\/(.+)$/); if (!m) closeModal(); });
-
-  // ===== 收藏 =====
-  const FAV_KEY = "heriland:favs";
-  function getFavs(){ try{ return new Set(JSON.parse(localStorage.getItem(FAV_KEY)||"[]")); }catch{ return new Set(); } }
-  function saveFavs(s){ localStorage.setItem(FAV_KEY, JSON.stringify([...s])); }
-  function toggleFavorite(id){ const s=getFavs(); s.has(id)? s.delete(id): s.add(id); saveFavs(s); }
-  function updateFavButton(id){ const s=getFavs(); const btn=$("#actFav"); if(!btn) return; btn.innerHTML = s.has(id) ? "❤️ <span>Favorited</span>" : "🤍 <span>Favorite</span>"; }
-
-  // ===== Fullscreen Glass Search =====
-  const overlay   = document.getElementById('searchOverlay');
-  const resultsEl = document.getElementById('overlayResults');
-  const closeBtn  = document.getElementById('overlayClose');
-  const field     = document.getElementById('searchField');
-  const pill      = document.getElementById('searchPill');
-  let lockY = 0;
-
-  function lockScroll(){
-    lockY = window.scrollY || document.documentElement.scrollTop || 0;
-    document.body.style.setProperty('--lock-top', `-${lockY}px`);
-    document.body.classList.add('search-lock');
-  }
-  function unlockScroll(){
-    document.body.classList.remove('search-lock');
-    window.scrollTo(0, lockY || 0);
-  }
-
-  function openOverlay(){
-    if (!overlay) return;
-    overlay.hidden = false;
-    lockScroll();
-    document.body.classList.add('searching');
-    requestAnimationFrame(()=> overlay.classList.add('active'));
-    field?.focus();
-  }
-
-  function closeOverlay(){
-    if (!overlay) return;
-    overlay.classList.remove('active');
-    document.body.classList.remove('searching');
-    setTimeout(()=> overlay.hidden = true, 250);
-    unlockScroll();
-  }
-
-  pill?.addEventListener('click', openOverlay);
-  closeBtn?.addEventListener('click', closeOverlay);
-  overlay?.addEventListener('click', e => { if (e.target === overlay) closeOverlay(); });
-  window.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
-
-  // ===== 搜尋邏輯 =====
-  function searchMerchants(q){
-    if (!q) return [];
-    const s = q.trim().toLowerCase();
-    const score = (m) => {
-      let sc = 0;
-      const name = (m.name||'').toLowerCase();
-      const desc = (m.description||'').toLowerCase();
-      if (name.startsWith(s)) sc += 6;
-      if (name.includes(s))  sc += 3;
-      if (desc.includes(s))  sc += 2;
-      if ((m.tagIds||[]).some(t => String(t).toLowerCase().includes(s))) sc += 1;
-      return sc;
-    };
-    return [...ALL]
-      .map(m => [score(m), m])
-      .filter(([sc]) => sc>0)
-      .sort((a,b)=>b[0]-a[0])
-      .slice(0, 30)
-      .map(([,m])=>m);
-  }
-
-  function renderResults(list){
-    resultsEl.innerHTML = '';
-    if (!list.length){
-      const empty = document.createElement('div');
-      empty.style.cssText = 'padding:12px;text-align:center;color:#666';
-      empty.textContent = 'No results. Try another keyword.';
-      resultsEl.appendChild(empty);
-      return;
-    }
-    list.forEach(m=>{
-      const row = document.createElement('div');
-      row.className = 'result-item';
-      row.innerHTML = `
-        <div class="result-thumb" style="background-image:url('${m.cover}')"></div>
-        <div class="result-main">
-          <div class="result-title">${m.name}</div>
-          <div class="result-sub">${m.address || ''}</div>
+  <!-- Modal（Place Detail） -->
+  <div class="modal-backdrop" id="placeModal" hidden aria-hidden="true">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="placeTitle">
+      <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+      <div class="modal-gallery" id="modalGallery"></div>
+      <div class="modal-body">
+        <h2 id="placeTitle"></h2>
+        <div class="place-meta" id="placeMeta"></div>
+        <p class="place-desc" id="placeDesc"></p>
+        <div class="place-info">
+          <div class="info-row" id="infoAddress"></div>
+          <div class="info-row" id="infoHours"></div>
         </div>
-        <div class="result-meta">${m.rating ?? ''}</div>
-      `;
-      row.addEventListener('click', ()=>{ closeOverlay(); openModal(m); });
-      resultsEl.appendChild(row);
-    });
-  }
+        <div class="action-row">
+          <a class="btn action" id="actCall" target="_blank" rel="noopener">📞 <span>Call</span></a>
+          <a class="btn action" id="actWA"   target="_blank" rel="noopener">💬 <span>WhatsApp</span></a>
+          <a class="btn action" id="actWeb"  target="_blank" rel="noopener">🖥️ <span>Website</span></a>
+          <a class="btn action" id="actMap"  target="_blank" rel="noopener">🗺️ <span>Map</span></a>
+          <button class="btn action" id="actShare">🔗 <span>Share</span></button>
+          <button class="btn action" id="actFav">❤️ <span>Favorite</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  // ===== 即時搜尋（防抖） =====
-  let tmr=null;
-  field?.addEventListener('input', (e)=>{
-    clearTimeout(tmr);
-    const q = e.target.value;
-    tmr = setTimeout(()=> renderResults(searchMerchants(q)), 120);
-  });
+  <footer class="site-footer" role="contentinfo">
+    <div class="container footer-row">
+      <small>© <span id="year"></span> HeriLand</small>
+    </div>
+  </footer>
 
-  // ===== collections → render =====
-  const collections = await loadJSON('data/collections.json');
-  const rows = collections?.rows || [];
-  const heroDef = rows.find(r => r.type === "hero-rail");
-  if (heroDef?.items?.length) renderHero(heroDef.items);
-  rows.filter(r => r.type !== "hero-rail").forEach(renderRow);
+  <!-- 共用底部導航 -->
+  <div data-include="partials/tabbar.html"></div>
 
-  console.log("Home rows initialized ✅");
-})();
+  <!-- Scripts -->
+  <script type="module" src="js/ui.js"></script>
+  <script src="js/include.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script type="module" src="js/home.js" defer></script>
+</body>
+</html>
