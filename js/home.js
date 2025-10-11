@@ -236,10 +236,16 @@ const pill      = document.getElementById('searchPill');
 function positionResults(){
   const r = pill.getBoundingClientRect();
   const margin = 8;
-  // 將結果面板對齊 pill 底緣
-  resultsEl.style.top    = `${Math.round(r.bottom + margin)}px`;
-  resultsEl.style.left   = `${Math.round(r.left)}px`;
-  resultsEl.style.width  = `${Math.round(r.width)}px`;
+  const safe = 12; // 左右安全邊
+  const vw = window.innerWidth;
+
+  const left  = Math.max(safe, Math.round(r.left));
+  const right = Math.max(safe, Math.round(vw - r.right));
+  const width = Math.round(vw - left - right);
+
+  resultsEl.style.top   = `${Math.round(r.bottom + margin)}px`;
+  resultsEl.style.left  = `${left}px`;
+  resultsEl.style.width = `${width}px`;
 }
 
 function openOverlay(){
