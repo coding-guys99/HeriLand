@@ -317,3 +317,11 @@ a{color:inherit;text-decoration:none}
   .search-tags{ color:#aeb7bf }
   .search-meta{ color:#e7edf2 }
 }
+
+.search-input { padding-right: 36px; }
+.clear-btn{
+  position:absolute; right:8px; top:50%; transform:translateY(-50%);
+  width:24px; height:24px; border-radius:999px; border:0; cursor:pointer;
+  background:rgba(0,0,0,.06);
+}
+.clear-btn:active{ transform:translateY(-50%) scale(.98); }
