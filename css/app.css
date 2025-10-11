@@ -271,3 +271,30 @@ a{color:inherit;text-decoration:none}
   .search-sub{ color:#c9ced3; }
   .search-meta{ color:#fff; }
 }
+
+/* ==== Scroll lock hardening for fullscreen search ==== */
+
+/* 全域關閉瀏覽器的邊緣回彈，把捲動封在當前容器 */
+html, body { overscroll-behavior: none; }
+
+.overlay-glass{
+  /* 不讓 backdrop 本身接收任何捲動/回彈 */
+  overscroll-behavior: none;
+  touch-action: none; /* 玻璃層不處理觸控，交給內部清單 */
+}
+
+/* 只有結果清單可以直向捲動（iOS 需要 -webkit-overflow-scrolling） */
+#searchOverlay .search-scroll{
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;  /* 到頂/到底不把事件傳給外層 */
+  touch-action: pan-y;            /* 允許垂直捲動，阻擋水平手勢 */
+}
+
+/* 鎖住背景頁位置（你的 .search-lock 已有，這裡補齊保險） */
+body.search-lock{
+  position: fixed;
+  left: 0; right: 0; width: 100%;
+  top: var(--lock-top, 0);
+  overflow: hidden;
+}
