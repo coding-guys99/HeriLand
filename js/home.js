@@ -200,26 +200,34 @@ const closeBtn  = document.getElementById('overlayClose');
 const field     = document.getElementById('searchField');
 const pill      = document.getElementById('searchPill');
 
-function positionResults(){
+function positionAnchors(){
+  if (!pill || !resultsEl) return;
+
+  const safe = 12;             // 左右保險邊
+  const margin = 8;            // pill 底緣到結果面板的距離
   const r = pill.getBoundingClientRect();
-  const margin = 8;
-  const safe = 12; // 左右安全邊
   const vw = window.innerWidth;
 
+  // 結果面板寬度：跟 pill 同寬，但預留左右保險邊
   const left  = Math.max(safe, Math.round(r.left));
   const right = Math.max(safe, Math.round(vw - r.right));
   const width = Math.round(vw - left - right);
 
-  resultsEl.style.top   = `${Math.round(r.bottom + margin)}px`;
-  resultsEl.style.left  = `${left}px`;
+  resultsEl.style.left = `${left}px`;
+  resultsEl.style.top  = `${Math.round(r.bottom + margin)}px`;
   resultsEl.style.width = `${width}px`;
+
+  // 同步把 pill 固定位置寫進 CSS 變數（讓它浮在 overlay 上）
+  document.documentElement.style.setProperty('--pill-left',  `${left}px`);
+  document.documentElement.style.setProperty('--pill-top',   `${Math.round(r.top)}px`);
+  document.documentElement.style.setProperty('--pill-width', `${width}px`);
 }
 
 function openOverlay(){
   if (!overlay) return;
   overlay.hidden = false;
   document.body.classList.add('searching');
-  positionResults();
+  positionAnchors();
 
   // 等一個 event loop 再開啟動畫（確保 DOM 已渲染）
   requestAnimationFrame(()=>{
@@ -228,8 +236,8 @@ function openOverlay(){
   });
 
   field?.focus();
-  window.addEventListener('resize', positionResults);
-  window.addEventListener('scroll', positionResults, { passive: true });
+  window.addEventListener('resize', positionAnchors());
+  window.addEventListener('scroll', positionAnchors(), { passive: true });
 }
 
 function closeOverlay(){
@@ -241,8 +249,8 @@ function closeOverlay(){
   // 等動畫結束後再隱藏 DOM
   setTimeout(()=>{ overlay.hidden = true; }, 250);
 
-  window.removeEventListener('resize', positionResults);
-  window.removeEventListener('scroll', positionResults);
+  window.removeEventListener('resize', positionAnchors());
+  window.removeEventListener('scroll', positionAnchors());
 }
 
 // 點背景（非結果面板）關閉
@@ -316,7 +324,7 @@ field?.addEventListener('input', (e)=>{
 // 首次打開時，若沒有輸入就先清空結果並定位
 field?.addEventListener('focus', ()=>{
   resultsEl.innerHTML = '';
-  positionResults();
+  positionAnchors();
 });
 
   // ── collections → render
