@@ -4,6 +4,7 @@
    - aggregates merchants from all divisions
    - renders Netflix-like rows
    ========================================================= */
+import { sheet, toast } from './ui.js';
 /* =========================================================
    HeriLand — Home (rows-first)
    ========================================================= */
@@ -208,3 +209,66 @@
 
   console.log("Home rows initialized ✅");
 })();
+
+// ===== Search Sheet integration =====
+// 1) 綁定按鈕
+document.getElementById('btnSearch')?.addEventListener('click', () => {
+  // 開啟抽屜並清空
+  sheet.open('sheetSearch');
+  const ipt = document.getElementById('searchInput');
+  const rail = document.getElementById('searchRail');
+  const hint = document.getElementById('searchHint');
+  if (ipt) { ipt.value = ''; ipt.focus(); }
+  if (rail) rail.innerHTML = '';
+  if (hint) hint.textContent = 'Type to search places. Showing top matches.';
+});
+document.getElementById('btnSearchClose')?.addEventListener('click', () => sheet.close());
+sheet.bindBackdrop('sheetSearch');
+
+// 2) 即時搜尋（前綴 + 名稱/描述/標籤）
+function searchMerchants(q){
+  if (!q) return [];
+  const s = q.trim().toLowerCase();
+  const score = (m) => {
+    let sc = 0;
+    if (m.name?.toLowerCase().startsWith(s)) sc += 5;
+    if (m.name?.toLowerCase().includes(s)) sc += 3;
+    if (m.description?.toLowerCase().includes(s)) sc += 2;
+    if ((m.tagIds||[]).some(t => String(t).toLowerCase().includes(s))) sc += 1;
+    return sc;
+  };
+  return [...ALL].map(m => [score(m), m]).filter(([sc]) => sc>0).sort((a,b)=>b[0]-a[0]).slice(0,12).map(([,m])=>m);
+}
+
+// 3) 將結果渲染成一條橫滑 rail（用你現有的 mini 卡）
+function renderSearchResults(list){
+  const rail = document.getElementById('searchRail');
+  const hint = document.getElementById('searchHint');
+  rail.innerHTML = '';
+  if (!list.length){
+    if (hint) hint.textContent = 'No results. Try another keyword.';
+    return;
+  }
+  if (hint) hint.textContent = `Top results · ${list.length}`;
+  list.forEach(m => {
+    const card = document.createElement('article');
+    card.className = 'card mini';
+    card.innerHTML = `
+      <div class="thumb" style="background-image:url('${m.cover}')"></div>
+      <div class="meta"><span>⭐ ${m.rating ?? '-'}</span></div>
+    `;
+    card.addEventListener('click', () => {
+      sheet.close();
+      openModal(m);
+    });
+    rail.appendChild(card);
+  });
+}
+
+// 4) 監聽輸入（加防抖）
+let tmr=null;
+document.getElementById('searchInput')?.addEventListener('input', (e) => {
+  clearTimeout(tmr);
+  const q = e.target.value;
+  tmr = setTimeout(()=> renderSearchResults(searchMerchants(q)), 120);
+});
