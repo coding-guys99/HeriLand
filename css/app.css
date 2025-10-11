@@ -695,3 +695,27 @@ body.searching #searchPill{ position: relative; z-index: 1300; }
   padding: 10px 12px;
 }
 .search-pill input{ flex:1; border:0; outline:0; font-size:16px; background:transparent; }
+
+/* ===== Backdrop 動畫 ===== */
+.overlay-glass{
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity .25s ease, transform .25s ease;
+  pointer-events: none;
+}
+.overlay-glass.active{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ===== 結果面板浮現動畫 ===== */
+.overlay-results{
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity .25s ease, transform .25s ease;
+}
+.overlay-results.active{
+  opacity: 1;
+  transform: translateY(0);
+}
