@@ -229,15 +229,17 @@ function openOverlay(){
   document.body.classList.add('searching');
   positionAnchors();
 
-  // 等一個 event loop 再開啟動畫（確保 DOM 已渲染）
   requestAnimationFrame(()=>{
     overlay.classList.add('active');
     resultsEl.classList.add('active');
   });
 
   field?.focus();
-  window.addEventListener('resize', positionAnchors());
-  window.addEventListener('scroll', positionAnchors(), { passive: true });
+
+  window.addEventListener('resize', positionAnchors);
+  window.addEventListener('scroll', positionAnchors, { passive: true });
+  window.visualViewport?.addEventListener('resize', positionAnchors);
+  window.visualViewport?.addEventListener('scroll', positionAnchors);
 }
 
 function closeOverlay(){
@@ -245,12 +247,12 @@ function closeOverlay(){
   overlay.classList.remove('active');
   resultsEl.classList.remove('active');
   document.body.classList.remove('searching');
-
-  // 等動畫結束後再隱藏 DOM
   setTimeout(()=>{ overlay.hidden = true; }, 250);
 
-  window.removeEventListener('resize', positionAnchors());
-  window.removeEventListener('scroll', positionAnchors());
+  window.removeEventListener('resize', positionAnchors);
+  window.removeEventListener('scroll', positionAnchors);
+  window.visualViewport?.removeEventListener('resize', positionAnchors);
+  window.visualViewport?.removeEventListener('scroll', positionAnchors);
 }
 
 // 點背景（非結果面板）關閉
