@@ -731,3 +731,20 @@ body.searching #searchPill{ position: relative; z-index: 1300; }
 .result-item:nth-child(2){ animation-delay: .08s; }
 .result-item:nth-child(3){ animation-delay: .1s; }
 /* 可以多複製幾行 nth-child */
+
+/* 搜尋中：把原本的搜尋膠囊固定在畫面上層 */
+body.searching #searchPill{
+  position: fixed;
+  z-index: 1301;
+  left: var(--pill-left, 12px);
+  top:  var(--pill-top,  12px);
+  width: var(--pill-width, calc(100vw - 24px));
+}
+
+/* 讓 Cancel 對齊搜尋框右邊（可微調間距） */
+body.searching #overlayClose{
+  position: fixed;
+  z-index: 1301;
+  top:  calc(var(--pill-top, 12px) + 2px);
+  right: 12px;
+}
