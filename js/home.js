@@ -223,10 +223,26 @@ function positionAnchors(){
   document.documentElement.style.setProperty('--pill-width', `${width}px`);
 }
 
+let _lockY = 0;
+
+function lockScroll(){
+  _lockY = window.scrollY || document.documentElement.scrollTop || 0;
+  document.documentElement.style.setProperty('--lock-top', `-${_lockY}px`);
+  document.body.style.setProperty('--lock-top', `-${_lockY}px`);
+  document.body.classList.add('search-lock');   // <- 真鎖
+}
+
+function unlockScroll(){
+  document.body.classList.remove('search-lock');
+  document.body.style.removeProperty('--lock-top');
+  document.documentElement.style.removeProperty('--lock-top');
+  window.scrollTo(0, _lockY || 0);              // 回復原位置
+}
+
 function openOverlay(){
   if (!overlay) return;
   overlay.hidden = false;
-  document.body.classList.add('searching');
+  lockScroll();                 // ★ 鎖住背景
   positionAnchors();
 
   requestAnimationFrame(()=>{
@@ -236,8 +252,8 @@ function openOverlay(){
 
   field?.focus();
 
-  window.addEventListener('resize', positionAnchors);
-  window.addEventListener('scroll', positionAnchors, { passive: true });
+  addEventListener('resize', positionAnchors);
+  addEventListener('scroll', positionAnchors, { passive:true });
   window.visualViewport?.addEventListener('resize', positionAnchors);
   window.visualViewport?.addEventListener('scroll', positionAnchors);
 }
@@ -246,11 +262,12 @@ function closeOverlay(){
   if (!overlay) return;
   overlay.classList.remove('active');
   resultsEl.classList.remove('active');
-  document.body.classList.remove('searching');
-  setTimeout(()=>{ overlay.hidden = true; }, 250);
 
-  window.removeEventListener('resize', positionAnchors);
-  window.removeEventListener('scroll', positionAnchors);
+  setTimeout(()=>{ overlay.hidden = true; }, 250);
+  unlockScroll();               // ★ 解鎖並回到原位
+
+  removeEventListener('resize', positionAnchors);
+  removeEventListener('scroll', positionAnchors);
   window.visualViewport?.removeEventListener('resize', positionAnchors);
   window.visualViewport?.removeEventListener('scroll', positionAnchors);
 }
