@@ -253,15 +253,27 @@ function openOverlay(){
   overlay.hidden = false;
   document.body.classList.add('searching');
   positionResults();
+
+  // 等一個 event loop 再開啟動畫（確保 DOM 已渲染）
+  requestAnimationFrame(()=>{
+    overlay.classList.add('active');
+    resultsEl.classList.add('active');
+  });
+
   field?.focus();
-  // 監聽 viewport 變化，保持對齊
   window.addEventListener('resize', positionResults);
   window.addEventListener('scroll', positionResults, { passive: true });
 }
+
 function closeOverlay(){
   if (!overlay) return;
-  overlay.hidden = true;
+  overlay.classList.remove('active');
+  resultsEl.classList.remove('active');
   document.body.classList.remove('searching');
+
+  // 等動畫結束後再隱藏 DOM
+  setTimeout(()=>{ overlay.hidden = true; }, 250);
+
   window.removeEventListener('resize', positionResults);
   window.removeEventListener('scroll', positionResults);
 }
