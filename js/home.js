@@ -4,25 +4,28 @@
    - aggregates merchants from all divisions
    - renders Netflix-like rows
    ========================================================= */
+/* =========================================================
+   HeriLand — Home (rows-first)
+   ========================================================= */
 (async () => {
   const $ = s => document.querySelector(s);
 
-  // GitHub Pages 友善：自動前綴
-  const ROOT = location.pathname.includes('/pages/') ? '..' : '.';
+  // 根目錄部署（GitHub Pages 友善）
+  const ROOT = '.';                      // ← 全站在根目錄
   const url = (p) => {
     if (!p) return '#';
-    if (/^https?:\/\//i.test(p)) return p;          // 絕對網址
-    if (p.startsWith('/')) return `${ROOT}${p}`;     // 以 / 開頭 → 補 ROOT
-    return `${ROOT}/${p.replace(/^\.\//,'')}`;       // 其他相對 → 補 ROOT/
+    if (/^https?:\/\//i.test(p)) return p;      // 絕對網址
+    if (p.startsWith('/')) return `${ROOT}${p}`; // 以 / 開頭 → 補 ROOT
+    return `${ROOT}/${p.replace(/^\.\//,'')}`;   // 其他相對 → 補 ROOT/
   };
 
-  // footer 年份
+  // 年份
   const yearEl = $("#year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
   // helpers
   async function loadJSON(path){
-    const u = url(path);
+    const u = url(path);                           // ★ 統一從這裡走 url()
     try{
       const r = await fetch(u);
       if(!r.ok) throw new Error(`${r.status} ${u}`);
@@ -33,11 +36,11 @@
     }
   }
   function el(tag, cls, html){ const x=document.createElement(tag); if(cls) x.className=cls; if(html!=null) x.innerHTML=html; return x; }
-  function mapLink(loc, addr){ if (loc?.lat && loc?.lng) return `https://www.google.com/maps?q=${loc.lat},${loc.lng}`; if (addr) return `https://www.google.com/maps?q=${encodeURIComponent(addr)}`; return null; }
+  function mapLink(loc, addr){ if(loc?.lat && loc?.lng) return `https://www.google.com/maps?q=${loc.lat},${loc.lng}`; if(addr) return `https://www.google.com/maps?q=${encodeURIComponent(addr)}`; return null; }
 
   // 搜尋膠囊 → Explore
   $("#btnSearch")?.addEventListener("click", () => {
-    location.href = url('pages/places.html');
+    location.href = url('places.html');           // ← 根目錄檔名
   });
 
   // Quick chips
@@ -53,9 +56,11 @@
   const qc = $("#quickChips");
   QUICK.forEach(q=>{
     const a = el("a","chip",q.label);
-    a.href = url(`pages/places.html#?tags=${encodeURIComponent(q.tags.join(","))}`);
+    a.href = url(`places.html#?tags=${encodeURIComponent(q.tags.join(","))}`); // ← 根目錄檔名
     qc.appendChild(a);
   });
+
+  // 之後你的其餘程式碼照舊…
 
   // 載入 divisions 與 merchants
   const cities = await loadJSON('data/cities.json');
