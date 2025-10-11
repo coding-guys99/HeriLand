@@ -226,6 +226,114 @@ function searchMerchants(q){
     .map(([,m])=>m);
 }
 
+// ===== Glass overlay search (anchored to #searchPill) =====
+const overlay   = document.getElementById('searchOverlay');
+const resultsEl = document.getElementById('overlayResults');
+const closeBtn  = document.getElementById('overlayClose');
+const field     = document.getElementById('searchField');
+const pill      = document.getElementById('searchPill');
+
+function positionResults(){
+  const r = pill.getBoundingClientRect();
+  const margin = 8;
+  // 將結果面板對齊 pill 底緣
+  resultsEl.style.top    = `${Math.round(r.bottom + margin)}px`;
+  resultsEl.style.left   = `${Math.round(r.left)}px`;
+  resultsEl.style.width  = `${Math.round(r.width)}px`;
+}
+
+function openOverlay(){
+  if (!overlay) return;
+  overlay.hidden = false;
+  document.body.classList.add('searching');
+  positionResults();
+  field?.focus();
+  // 監聽 viewport 變化，保持對齊
+  window.addEventListener('resize', positionResults);
+  window.addEventListener('scroll', positionResults, { passive: true });
+}
+function closeOverlay(){
+  if (!overlay) return;
+  overlay.hidden = true;
+  document.body.classList.remove('searching');
+  window.removeEventListener('resize', positionResults);
+  window.removeEventListener('scroll', positionResults);
+}
+
+// 點背景（非結果面板）關閉
+overlay?.addEventListener('click', (e)=>{
+  if (e.target === overlay) closeOverlay();
+});
+closeBtn?.addEventListener('click', closeOverlay);
+window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeOverlay(); });
+
+// 聚合搜尋
+function searchMerchants(q){
+  if (!q) return [];
+  const s = q.trim().toLowerCase();
+  const score = (m) => {
+    let sc = 0;
+    const name = (m.name||'').toLowerCase();
+    const desc = (m.description||'').toLowerCase();
+    if (name.startsWith(s)) sc += 6;
+    if (name.includes(s))  sc += 3;
+    if (desc.includes(s))  sc += 2;
+    if ((m.tagIds||[]).some(t => String(t).toLowerCase().includes(s))) sc += 1;
+    return sc;
+  };
+  return [...ALL]
+    .map(m => [score(m), m])
+    .filter(([sc]) => sc>0)
+    .sort((a,b)=>b[0]-a[0])
+    .slice(0, 30)
+    .map(([,m])=>m);
+}
+
+function renderResults(list){
+  resultsEl.innerHTML = '';
+  if (!list.length){
+    const empty = document.createElement('div');
+    empty.style.cssText = 'padding:10px 12px; color:#666; font-size:14px;';
+    empty.textContent = 'No results. Try another keyword.';
+    resultsEl.appendChild(empty);
+    return;
+  }
+  list.forEach(m=>{
+    const row = document.createElement('div');
+    row.className = 'result-item';
+    row.innerHTML = `
+      <div class="result-thumb" style="background-image:url('${m.cover}')"></div>
+      <div class="result-main">
+        <div class="result-title">${m.name}</div>
+        <div class="result-sub">${m.address || ''}</div>
+      </div>
+      <div class="result-meta">
+        ${m.rating ? `⭐ ${m.rating}` : ''} ${m.priceLevel ? ` · ${'💲'.repeat(m.priceLevel)}` : ''}
+      </div>
+    `;
+    row.addEventListener('click', ()=>{ closeOverlay(); openModal(m); });
+    resultsEl.appendChild(row);
+  });
+}
+
+// 進入搜尋狀態：點 pill 或聚焦 input
+pill?.addEventListener('click', openOverlay);
+field?.addEventListener('focus', openOverlay);
+
+// 即時搜尋（防抖）
+let tmr=null;
+field?.addEventListener('input', (e)=>{
+  clearTimeout(tmr);
+  const q = e.target.value;
+  tmr = setTimeout(()=> renderResults(searchMerchants(q)), 120);
+});
+
+// 首次打開時，若沒有輸入就先清空結果並定位
+field?.addEventListener('focus', ()=>{
+  resultsEl.innerHTML = '';
+  positionResults();
+});
+
 function renderSearchResults(listData){
   const list = document.getElementById('searchList');
   const hint = document.getElementById('searchHint');
