@@ -48,18 +48,17 @@
     </section>
   </main>
   
-  <!-- Search Bottom Sheet -->
-<div class="sheet" id="sheetSearch" hidden>
-  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
-    <div class="sheet-head">
-      <div class="sheet-title" id="searchTitle">Search</div>
-      <button class="sheet-close" id="btnSearchClose">Close</button>
+<!-- Fullscreen Glass Search -->
+<div class="sheet sheet--glass" id="sheetSearch" hidden>
+  <div class="search-bar">
+    <div class="search-input">
+      🔍 <input id="searchInput" type="search" placeholder="Search: seafood, museum, beach…" autocomplete="off"/>
     </div>
-    <div class="sheet-input">
-      🔍 <input id="searchInput" type="search" placeholder="Try: seafood, museum, beach…" autocomplete="off" />
-    </div>
-    <div class="sheet-hint" id="searchHint">Type to search places. Showing top matches.</div>
-    <div class="sheet-rail" id="searchRail" role="list"></div>
+    <button class="search-cancel" id="btnSearchClose">Cancel</button>
+  </div>
+  <div class="search-scroll">
+    <div class="search-hint" id="searchHint">Popular: seafood · museum · beach</div>
+    <div class="search-list" id="searchList" role="list"></div>
   </div>
 </div>
 
