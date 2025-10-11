@@ -39,11 +39,6 @@ import { sheet, toast } from './ui.js';
   function el(tag, cls, html){ const x=document.createElement(tag); if(cls) x.className=cls; if(html!=null) x.innerHTML=html; return x; }
   function mapLink(loc, addr){ if(loc?.lat && loc?.lng) return `https://www.google.com/maps?q=${loc.lat},${loc.lng}`; if(addr) return `https://www.google.com/maps?q=${encodeURIComponent(addr)}`; return null; }
 
-  // 搜尋膠囊 → Explore
-  $("#btnSearch")?.addEventListener("click", () => {
-    location.href = url('places.html');           // ← 根目錄檔名
-  });
-
   // Quick chips
   const QUICK = [
     { label:"Taste",      tags:["food"] },
@@ -107,7 +102,8 @@ import { sheet, toast } from './ui.js';
   }
   function divisionPill(d){
     const a = el("a","division-pill",`<span>${d.name_en.replace(" Division","")}</span>`);
-    a.href = url(`pages/places.html#/d/${d.id}`);
+    a.href = url(`places.html#/d/${d.id}`);
+
     return a;
   }
 
@@ -130,7 +126,7 @@ import { sheet, toast } from './ui.js';
     const sec = el("section","row-section");
     const head = el("div","row-head",`
       <h2>${rowDef.title || ""}</h2>
-      ${rowDef.type!=="division-row" ? `<a class="see-all" href="${url('pages/places.html')}">See all</a>` : ''}
+      ${rowDef.type!=="division-row" ? `<a class="see-all" href="${url('places.html')}">See all</a>` : ''
     `);
     const rail = el("div","rail");
 
