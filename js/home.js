@@ -4,6 +4,20 @@
    - aggregates merchants from all divisions
    - renders Netflix-like rows
    ========================================================= */
+
+/* HeriLand — Home (rows-first) */
+(async () => {
+  const $ = s => document.querySelector(s);
+
+  // ★ 新增：依是否在 /pages/ 底下自動決定根路徑（GitHub Pages 友善）
+  const ROOT = location.pathname.includes('/pages/') ? '..' : '.';
+  const url = (p) => {
+    if (!p) return '#';
+    if (/^https?:\/\//i.test(p)) return p;       // 絕對網址直接用
+    if (p.startsWith('/')) return `${ROOT}${p}`; // 以 / 開頭 → 補上 ROOT
+    return `${ROOT}/${p.replace(/^\.\//,'')}`;   // 其他相對路徑 → 補上 ROOT/
+  };
+
 /* HeriLand — Home (rows-first) */
 (async () => {
   const $ = s => document.querySelector(s);
@@ -22,7 +36,7 @@
 
   // ---------- search pill ----------
   $("#btnSearch")?.addEventListener("click", () => {
-    location.href = "/pages/places.html";
+    location.href = "places.html";
   });
 
   // ---------- quick chips ----------
@@ -38,31 +52,31 @@
   const qc = $("#quickChips");
   QUICK.forEach(q=>{
     const a = el("a","chip",q.label);
-    a.href = `/pages/places.html#?tags=${encodeURIComponent(q.tags.join(","))}`;
+    a.href = `places.html#?tags=${encodeURIComponent(q.tags.join(","))}`;
     qc.appendChild(a);
   });
 
   // ---------- load cities & merchants ----------
-  const cities = await loadJSON("/data/cities.json");
+  const cities = await loadJSON("data/cities.json");
   const divisionIds = (cities?.divisions || []).map(d=>d.id);
   // 聚合所有 division 的 merchants（首頁要跨區策展）
   let ALL = [];
   for (const id of divisionIds){
-    const data = await loadJSON(`/data/merchants/${id}.json`);
+    const data = await loadJSON(`data/merchants/${id}.json`);
     if (data?.items) ALL.push(...data.items);
   }
 
   // ---------- hero rail ----------
-  function renderHero(items){
+    function renderHero(items){
     const rail = $("#heroRail"); rail.innerHTML = "";
     items.forEach(it=>{
       const card = el("a","hero-card",`
-        <img src="${it.image}" alt="">
+        <img src="${url(it.image)}" alt="">
         <span class="hero-caption">
           ${it.title} ${it.sponsored ? '<em class="ad">Ad</em>' : ''}
         </span>
       `);
-      card.href = it.url || "#";
+      card.href = url(it.url || "#");
       rail.appendChild(card);
     });
   }
@@ -86,9 +100,10 @@
   }
   function divisionPill(d){
     const a = el("a","division-pill",`<span>${d.name_en.replace(" Division","")}</span>`);
-    a.href = `/pages/places.html#/d/${d.id}`;
+    a.href = url(`places.html#/d/${d.id}`);
     return a;
   }
+
 
   function filterBySource(src){
     let arr = [...ALL];
@@ -110,8 +125,9 @@
     const sec = el("section","row-section");
     const head = el("div","row-head",`
       <h2>${rowDef.title || ""}</h2>
-      ${rowDef.type!=="division-row" ? '<a class="see-all" href="/pages/places.html">See all</a>' : ''}
+      ${rowDef.type!=="division-row" ? `<a class="see-all" href="${url('places.html')}">See all</a>` : ''}
     `);
+
     const rail = el("div","rail");
 
     if (rowDef.type === "poster-row"){
@@ -180,7 +196,7 @@
   function updateFavButton(id){ const s=getFavs(); const btn=$("#actFav"); if(!btn) return; btn.innerHTML = s.has(id) ? "❤️ <span>Favorited</span>" : "🤍 <span>Favorite</span>"; }
 
   // ---------- collections → render ----------
-  const collections = await loadJSON("/data/collections.json");
+    const collections = await loadJSON( url('data/collections.json') );
   const rows = collections?.rows || [];
 
   // Hero rail
