@@ -476,3 +476,112 @@ a{color:inherit;text-decoration:none}
 
 /* 右側評分寬度固定 */
 .search-meta{ width:64px; justify-content:flex-end; }
+
+/* === Search Results — White List style ===================== */
+
+/* 背景：半透明白玻璃感（非黑） */
+.overlay-glass{
+  background: color-mix(in srgb, rgba(255,255,255,.8) 100%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
+}
+
+/* 去掉結果的卡片背景與陰影 → 用純列表 */
+.search-scroll{
+  padding: 6px 0 calc(16px + env(safe-area-inset-bottom));
+  background: transparent;
+}
+.search-list{
+  display: flex;
+  flex-direction: column;
+  margin: 0 12px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.6);
+  background: rgba(255,255,255,.85);
+  box-shadow: 0 8px 24px rgba(0,0,0,.05);
+}
+
+/* 每筆項目 */
+.search-item{
+  display: grid;
+  grid-template-columns: 36px 72px 1fr 60px;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  margin: 0;
+  transition: background .15s ease;
+}
+.search-item + .search-item{
+  border-top: 1px solid rgba(0,0,0,.05); /* 白線分隔 */
+}
+.search-item:active{
+  background: rgba(0,0,0,.05);
+  transform: none;
+}
+
+/* 左側序號圓圈 */
+.search-index{
+  width: 24px; height: 24px;
+  border-radius: 999px;
+  background: color-mix(in srgb, #e4c77d 70%, #fff 30%);
+  color: #fff; font-weight:700;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.15);
+}
+
+/* 縮圖微縮小、留白一點 */
+.search-thumb{
+  width: 72px; height: 56px;
+  border-radius: 10px;
+  background: #ddd center/cover no-repeat;
+}
+
+/* 主要文字：黑＋灰 */
+.search-main{
+  min-width: 0;
+  display: flex; flex-direction: column;
+  gap: 2px;
+}
+.search-title{
+  font-weight: 700;
+  font-size: 15px;
+  color: #111;
+  line-height: 1.25;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.search-sub{
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* 評分區（右側） */
+.search-meta{
+  font-size: 13px; font-weight: 700;
+  color: #333;
+  text-align: right;
+  display: flex; align-items: center; justify-content: flex-end; gap: 4px;
+}
+.search-meta::before{ content: "⭐"; color: #e6b800; }
+
+/* 暗色模式保護：背景維持亮，線稍微透明 */
+@media (prefers-color-scheme: dark){
+  .overlay-glass{
+    background: color-mix(in srgb, rgba(30,32,36,.8) 100%, transparent);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+  }
+  .search-list{
+    background: color-mix(in srgb, #101214 80%, transparent);
+    border-color: rgba(255,255,255,.08);
+  }
+  .search-item + .search-item{ border-top-color: rgba(255,255,255,.08); }
+  .search-title{ color: #f5f5f5; }
+  .search-sub{ color: #c9ced3; }
+  .search-meta{ color: #fff; }
+}
