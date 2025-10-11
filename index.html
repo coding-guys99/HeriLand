@@ -47,6 +47,23 @@
            - Theme rows（poster-row） -->
     </section>
   </main>
+  
+  <!-- Search Bottom Sheet -->
+<div class="sheet" id="sheetSearch" hidden>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
+    <div class="sheet-head">
+      <div class="sheet-title" id="searchTitle">Search</div>
+      <button class="sheet-close" id="btnSearchClose">Close</button>
+    </div>
+    <div class="sheet-input">
+      🔍 <input id="searchInput" type="search" placeholder="Try: seafood, museum, beach…" autocomplete="off" />
+    </div>
+    <div class="sheet-hint" id="searchHint">Type to search places. Showing top matches.</div>
+    <div class="sheet-rail" id="searchRail" role="list"></div>
+  </div>
+</div>
+
+<script type="module" src="js/ui.js"></script>
 
   <!-- Place Detail Modal（沿用你的抽屜） -->
   <div class="modal-backdrop" id="placeModal" hidden aria-hidden="true">
