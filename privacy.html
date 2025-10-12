@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Tabbar RWD Test</title>
+<style>
+:root{
+  --bg:#FAF6EF;
+  --text:#1A1A1A;
+  --muted:rgba(0,0,0,.55);
+  --line:rgba(0,0,0,.08);
+  --glass: color-mix(in srgb, #ffffff 86%, transparent);
+  --blur: 16px;
+  --accent:#2E5E4E;
+  --radius: 12px;               /* 手機選中塊：8–13之間，先用12 */
+  --radius-desktop:10px;        /* 桌機選中塊 */
+  --tab-h:56px;
+  --safe: env(safe-area-inset-bottom, 0px);
+  --anim: 180ms cubic-bezier(.22,.55,.22,1); /* 平滑、耐看 */
+}
+
+/* Base */
+*{ box-sizing:border-box }
+html,body{ height:100% }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family: system-ui, -apple-system, "Inter", "Noto Sans TC", sans-serif;
+  line-height:1.6;
+  scroll-behavior:smooth; /* 平滑滾動 */
+  padding-bottom: calc(var(--tab-h) + var(--safe)); /* 避免被底部導覽遮住（行動） */
+}
+h1,h2{ margin:0 0 8px }
+p{ margin:0 0 12px }
+
+/* 顶部 AppBar（桌機可當工具列占位） */
+.header{
+  position: sticky; top:0; z-index:5;
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px; border-bottom:1px solid var(--line);
+  background: linear-gradient(180deg, rgba(250,246,239,.86), rgba(250,246,239,.98));
+  backdrop-filter: blur(6px);
+}
+.header .hello{ font-weight:800; letter-spacing:.2px }
+.header .sub{ font-size:12px; color:var(--muted) }
+
+/* 內容區塊（做成五屏，演示平滑切換） */
+.section{
+  min-height: 90vh; padding: 20px 16px 40px;
+  display:grid; align-content:start; gap:10px;
+  border-bottom:1px solid var(--line);
+}
+.section .card{
+  background:#fff; border:1px solid var(--line); border-radius:14px;
+  padding:14px; box-shadow: 0 8px 24px rgba(0,0,0,.06);
+}
+
+/* ===== 導覽：行動（底部 5-tab 膠囊） ===== */
+.tabbar{
+  position: fixed; left:0; right:0; bottom:0; z-index:100;
+  display:flex; justify-content:center; align-items:center;
+  padding: 8px 10px calc(8px + var(--safe));
+  background: transparent; /* 玻璃膠囊本身做在內部容器 */
+  pointer-events:none;     /* 只讓內部可點 */
+}
+.tabbar .shell{
+  position: relative;
+  width: min(92%, 520px); height: var(--tab-h);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(120%);
+  backdrop-filter: blur(var(--blur)) saturate(120%);
+  border:1px solid rgba(0,0,0,.06);
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  pointer-events:auto;
+  display:grid; grid-template-columns: repeat(5, 1fr);
+}
+.tabbar button{
+  appearance:none; border:0; background:transparent; margin:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:4px; font-size:11px; color:#233; cursor:pointer; position:relative;
+}
+
+/* 動態選中塊（膠囊） */
+.tabbar .pill{
+  position:absolute; inset:4px auto 4px 4px;
+  width: calc((100% - 8px) / 5); /* 5 個欄位 */
+  border-radius: var(--radius);
+  background: rgba(255,255,255,.96);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.06), 0 8px 18px rgba(0,0,0,.14);
+  transform: translateX(0);
+  transition: transform var(--anim);
+  will-change: transform;
+  z-index:0;
+}
+.tabbar .icon, .tabbar .label{ position:relative; z-index:1 }
+.tabbar .icon{ font-size:18px; line-height:1 }
+.tabbar .label{ opacity:.85 }
+
+/* 選中態文字加粗一點 */
+.tabbar button[aria-current="page"] .label{ font-weight:700 }
+
+/* ===== 桌機：頂部導覽（取代底部） ===== */
+@media (min-width: 840px){
+  body{ padding-bottom: 0 } /* 桌機沒有底部導覽 */
+  .tabbar{ display:none }
+
+  .topnav{
+    position: sticky; top:0; z-index:6;
+    border-bottom:1px solid var(--line);
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(var(--blur)) saturate(120%);
+    backdrop-filter: blur(var(--blur)) saturate(120%);
+    box-shadow: 0 8px 24px rgba(0,0,0,.10);
+  }
+  .topnav .track{
+    position:relative; max-width:1200px; margin:0 auto; padding: 8px 16px;
+    display:grid; grid-template-columns: repeat(5, max-content); gap:8px;
+  }
+  .topnav .pill{
+    position:absolute; top:6px; bottom:6px; left:16px; width:auto;
+    border-radius: var(--radius-desktop);
+    background: rgba(255,255,255,.96);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.06), 0 8px 18px rgba(0,0,0,.14);
+    transition: transform var(--anim), width var(--anim);
+    will-change: transform, width;
+    z-index:0;
+  }
+  .topnav button{
+    position:relative; z-index:1;
+    appearance:none; border:0; background:transparent; cursor:pointer;
+    font-weight:600; padding: 10px 12px; border-radius: 10px;
+  }
+  .topnav button[aria-current="page"]{ color:#000; }
+}
+
+/* 可及性：鍵盤焦點 */
+button:focus-visible{
+  outline: 2px solid color-mix(in srgb, var(--accent) 65%, #fff 35%);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+/* 減少動效偏好 */
+@media (prefers-reduced-motion: reduce){
+  :root{ --anim: 0ms linear }
+  .tabbar .pill, .topnav .pill{ transition: none }
+}
+
+/* 小小的內容顏色 */
+.muted{ color: var(--muted) }
+.demo-block{ display:grid; gap:12px }
+</style>
+</head>
+<body>
+
+<!-- 頂部問候（手機/桌機都顯示） -->
+<header class="header">
+  <div>
+    <div class="hello">Hello</div>
+    <div class="sub">Explore Sarawak</div>
+  </div>
+</header>
+
+<!-- 桌機頂部導覽（≥840px 顯示） -->
+<nav class="topnav" aria-label="Primary" hidden>
+  <div class="track" id="topTrack">
+    <div class="pill" id="topPill" aria-hidden="true"></div>
+    <button data-target="#home"   class="tn" aria-current="page">Home</button>
+    <button data-target="#search" class="tn">Search</button>
+    <button data-target="#explore" class="tn">Explore</button>
+    <button data-target="#saved"  class="tn">Saved</button>
+    <button data-target="#me"     class="tn">Me</button>
+  </div>
+</nav>
+
+<main>
+  <section id="home" class="section">
+    <h2>Home</h2>
+    <div class="demo-block">
+      <div class="card"><strong>Hero</strong><div class="muted">輪播 / 活動 / 精選模組</div></div>
+      <div class="card"><strong>Rows</strong><div class="muted">Netflix-style rails</div></div>
+    </div>
+  </section>
+
+  <section id="search" class="section">
+    <h2>Search</h2>
+    <div class="card"><strong>Overlay</strong><div class="muted">玻璃搜尋、結果列表</div></div>
+  </section>
+
+  <section id="explore" class="section">
+    <h2>Explore</h2>
+    <div class="card"><strong>Grid</strong><div class="muted">多欄卡片 / 篩選工具列</div></div>
+  </section>
+
+  <section id="saved" class="section">
+    <h2>Saved</h2>
+    <div class="card"><strong>Favorites</strong><div class="muted">收藏清單 / 離線</div></div>
+  </section>
+
+  <section id="me" class="section">
+    <h2>Me</h2>
+    <div class="card"><strong>Profile</strong><div class="muted">登入 / 設定</div></div>
+  </section>
+</main>
+
+<!-- 手機底部 5-tab -->
+<nav class="tabbar" aria-label="Primary">
+  <div class="shell" id="tabShell">
+    <div class="pill" id="tabPill" aria-hidden="true"></div>
+    <button class="tab" data-target="#home"   aria-current="page">
+      <div class="icon">🏠</div><div class="label">Home</div>
+    </button>
+    <button class="tab" data-target="#search">
+      <div class="icon">🔍</div><div class="label">Search</div>
+    </button>
+    <button class="tab" data-target="#explore">
+      <div class="icon">🗺️</div><div class="label">Explore</div>
+    </button>
+    <button class="tab" data-target="#saved">
+      <div class="icon">❤️</div><div class="label">Saved</div>
+    </button>
+    <button class="tab" data-target="#me">
+      <div class="icon">🙂</div><div class="label">Me</div>
+    </button>
+  </div>
+</nav>
+
+<script>
+/* ----------
+  Core 行為：
+  1) 點擊 tab/頂部按鈕 → 平滑滾動到對應 section
+  2) ScrollSpy → 自動高亮目前區段
+  3) 動態膠囊（pill）用 transform/width 移動（效能佳）
+---------- */
+const sections = [...document.querySelectorAll('main .section')];
+const ids = sections.map(s => '#' + s.id);
+
+// Mobile tab
+const tabShell = document.getElementById('tabShell');
+const tabPill  = document.getElementById('tabPill');
+const tabs     = [...tabShell.querySelectorAll('button.tab')];
+
+// Desktop topnav
+const topnav   = document.querySelector('.topnav');
+const topTrack = document.getElementById('topTrack');
+const topPill  = document.getElementById('topPill');
+const tns      = topTrack ? [...topTrack.querySelectorAll('button.tn')] : [];
+
+// RWD：≥840 顯示 topnav、隱藏底部
+function applyRWD(){
+  const isDesktop = window.matchMedia('(min-width: 840px)').matches;
+  if (topnav) topnav.hidden = !isDesktop;
+}
+applyRWD();
+window.addEventListener('resize', applyRWD);
+
+// 移動 mobile 膠囊
+function moveTabPill(index){
+  if (!tabPill) return;
+  const w = tabShell.clientWidth - 8;      // 兩側 inset: 4px + 4px
+  const cellW = w / 5;
+  tabPill.style.transform = `translateX(${index * cellW}px)`;
+}
+
+// 移動 desktop 膠囊（需要量測按鈕寬）
+function moveTopPill(index){
+  if (!topPill || !tns[index]) return;
+  const btn = tns[index];
+  const trackRect = topTrack.getBoundingClientRect();
+  const btnRect   = btn.getBoundingClientRect();
+  const x = btnRect.left - trackRect.left - 4; // 微內縮
+  const w = btnRect.width + 8;
+  topPill.style.transform = `translateX(${x}px)`;
+  topPill.style.width = `${w}px`;
+}
+
+// 設定目前 active（aria-current）
+function setActiveById(hash){
+  // mobile
+  tabs.forEach((b)=> b.removeAttribute('aria-current'));
+  const mIdx = tabs.findIndex(b => b.dataset.target === hash);
+  if (mIdx >= 0) tabs[mIdx].setAttribute('aria-current','page');
+
+  // desktop
+  tns.forEach((b)=> b.removeAttribute('aria-current'));
+  const dIdx = tns.findIndex(b => b.dataset.target === hash);
+  if (dIdx >= 0) tns[dIdx].setAttribute('aria-current','page');
+
+  // 移動指示膠囊
+  if (mIdx >= 0) moveTabPill(mIdx);
+  if (dIdx >= 0) moveTopPill(dIdx);
+}
+
+// 點擊導覽 → 滾到該區
+function onNavClick(e){
+  const btn = e.currentTarget;
+  const target = document.querySelector(btn.dataset.target);
+  if (!target) return;
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+tabs.forEach(b => b.addEventListener('click', onNavClick));
+tns.forEach(b => b.addEventListener('click', onNavClick));
+
+// ScrollSpy：觀察 section 進出視窗
+const spy = new IntersectionObserver((entries)=>{
+  // 按可見比例排序，取最可見的那個
+  const vis = entries
+    .filter(en => en.isIntersecting)
+    .sort((a,b)=> b.intersectionRatio - a.intersectionRatio)[0];
+
+  if (vis){
+    const id = '#' + vis.target.id;
+    setActiveById(id);
+    history.replaceState(null,'',id); // 更新 URL 片段（不重載）
+  }
+}, { rootMargin: '-40% 0px -55% 0px', threshold:[0, .25, .5, .75, 1] });
+
+sections.forEach(sec => spy.observe(sec));
+
+// 初始定位（根據 URL hash）
+(function initFromHash(){
+  const h = location.hash && ids.includes(location.hash) ? location.hash : '#home';
+  setActiveById(h);
+  // 若直接打開非頂部：輕輕滾一下到正位
+  const tgt = document.querySelector(h);
+  if (tgt) setTimeout(()=> tgt.scrollIntoView({behavior:'auto', block:'start'}), 0);
+})();
+</script>
+</body>
+</html>
