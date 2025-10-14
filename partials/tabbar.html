@@ -1,22 +1,19 @@
-<!-- 放在各個 <a class="tab"> 之前 -->
-<div class="bg" aria-hidden="true"></div>
-<div class="tabwrap">
-
-<nav class="tabbar tabbar--capsule" id="TabBar" aria-label="Main">
-  <a class="tab" href="index.html"            data-match="index.html"     aria-label="Home">
-    <span class="ico">🏠</span>
-  </a>
-  <a class="tab" href="places.html"     data-match="places.html"    aria-label="Explore">
-    <span class="ico">🗺️</span>
-  </a>
-  <a class="tab" href="favorites.html"  data-match="favorites.html" aria-label="Favorites">
-    <span class="ico">❤️</span>
-  </a>
-  <button class="tab" id="tabSubmit" hidden aria-label="Submit">
-    <span class="ico">➕</span>
-  </button>
-  <a class="tab" href="settings.html"   data-match="settings.html"  aria-label="My">
-    <span class="ico">👤</span>
-  </a>
+<nav class="tabbar" aria-label="主要導覽">
+  <div class="capsule" role="tablist">
+    <button class="tab" role="tab" data-target="home" aria-selected="true" aria-current="page">
+      <span class="ico">🏠</span><span class="txt">Home</span>
+    </button>
+    <button class="tab" role="tab" data-target="explore" aria-selected="false">
+      <span class="ico">🧭</span><span class="txt">Explore</span>
+    </button>
+    <button class="tab" role="tab" data-target="map" aria-selected="false">
+      <span class="ico">🗺️</span><span class="txt">Map</span>
+    </button>
+    <button class="tab" role="tab" data-target="saved" aria-selected="false">
+      <span class="ico">⭐</span><span class="txt">Saved</span>
+    </button>
+    <button class="tab" role="tab" data-target="add" aria-selected="false">
+      <span class="ico">➕</span><span class="txt">Add</span>
+    </button>
+  </div>
 </nav>
-</div>
