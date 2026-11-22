@@ -10,6 +10,14 @@ const cities=[['Kuching',1.5535,110.3593],['Sibu',2.2873,111.8305],['Miri',4.399
 const categories=['Food & Cafe','Travel & Nature','Lifestyle','Hidden Gems','Events & Festivals','Shopping','Campus Life','Jobs & Opportunities','Home & Living','Community','Local Businesses','Deals & Promotions'];
 let session;try{session=JSON.parse(localStorage.getItem(SESSION_KEY)||'null')}catch{session=null}
 let currentUser=null;
+// Supabase email verification can redirect back with an implicit-flow session.
+const hash=new URLSearchParams(location.hash.replace(/^#/, ''));
+if(hash.get('access_token')&&hash.get('refresh_token')){
+ const expires=Number(hash.get('expires_in')||3600);
+ saveSession({access_token:hash.get('access_token'),refresh_token:hash.get('refresh_token'),expires_at:Math.floor(Date.now()/1000)+expires});
+ history.replaceState(null,'',location.pathname+location.search);
+}
+
 function saveSession(s){session=s;if(s)localStorage.setItem(SESSION_KEY,JSON.stringify(s));else localStorage.removeItem(SESSION_KEY)}
 const result=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}});
 const fail=(e,status=400)=>result({error:String(e?.message||e)},status);
@@ -158,17 +166,20 @@ async function route(url,init){
  if(path==='/posts'&&method==='POST'){
   if(!currentUser)throw Object.assign(Error('Sign in to publish'),{status:401});
   if(!body.title?.trim())throw Error('Post title is required');
+  if(!Array.isArray(body.media)||body.media.length>10)throw Error('Maximum 10 media items');
+  // Validate file ownership BEFORE creating the post to avoid orphan posts.
+  const prefix=BASE+'/storage/v1/object/public/heriland-media/';
+  const mediaFiles=body.media.map((url,i)=>{
+   const path=String(url).startsWith(prefix)?decodeURIComponent(String(url).slice(prefix.length)):null;
+   if(!path?.startsWith(currentUser.id+'/'))throw Error('Only your uploads can be attached');
+   return {path,kind:/\.mp4$/i.test(path)?'video':'image',sort_order:i};
+  });
   if(!categories.includes(body.category)||!cities.some(c=>c.name===body.city))throw Error('Invalid category or city');
   const created=await insert('posts',{user_id:currentUser.id,title:body.title.trim().slice(0,140),body:String(body.body||'').slice(0,5000),city:body.city,category:body.category});
-  const id=created[0].id,media=body.media||[];
-  if(media.length){
-   const prefix=BASE+'/storage/v1/object/public/heriland-media/';
-   const files=media.map((url,i)=>{
-    const path=String(url).startsWith(prefix)?decodeURIComponent(String(url).slice(prefix.length)):null;
-    if(!path?.startsWith(currentUser.id+'/'))throw Error('Only your uploads can be attached');
-    return {post_id:id,path,kind:/\.mp4$/i.test(path)?'video':'image',sort_order:i};
-   });
-   await insert('post_media',files);
+  const id=created[0].id;
+  if(mediaFiles.length){
+   try{await insert('post_media',mediaFiles.map(m=>({...m,post_id:id})))}
+   catch(e){await remove('posts',{id:'eq.'+id,user_id:'eq.'+currentUser.id}).catch(()=>{});throw e}
   }
   await remove('drafts',{user_id:'eq.'+currentUser.id});
   return {ok:true,id};
