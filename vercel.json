@@ -1,0 +1,1 @@
+{"cleanUrls":false,"trailingSlash":false,"rewrites":[{"source":"/api/:path*","destination":"/index.html"}]}

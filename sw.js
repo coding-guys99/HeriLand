@@ -1,0 +1,1 @@
+/* SW intentionally disabled for statically exported read-only preview. */

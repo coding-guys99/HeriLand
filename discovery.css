@@ -1,0 +1,35 @@
+/* HeriLand's local discovery model in KAMEK's visual shell */
+.discovery-hero{display:grid;grid-template-columns:1.12fr .88fr;background:#e9eee5;border-radius:19px;min-height:340px;overflow:hidden;margin:6px 0 32px}
+.discovery-hero-copy{padding:clamp(23px,4vw,53px);display:flex;align-items:flex-start;justify-content:center;flex-direction:column;gap:14px}
+.discovery-hero h2{font:800 clamp(30px,4vw,53px)/1.09 Manrope,system-ui,sans-serif;letter-spacing:-2px;margin:0;color:#253d33}
+.discovery-hero h2 em{font-style:normal;color:#a46852}
+.discovery-hero p{font-size:14px;line-height:1.7;color:#607067;max-width:390px;margin:0}
+.discovery-hero-photo{overflow:hidden;min-height:310px}.discovery-hero-photo img{width:100%;height:100%;object-fit:cover}
+.discovery-hero-actions{display:flex;gap:9px;flex-wrap:wrap}.discovery-hero-actions button{background:#273d35;color:white;padding:12px 17px;border-radius:9px;font-size:12px;font-weight:700}.discovery-hero-actions .ghost{background:transparent;color:#273d35;border:1px solid #abbcb0}
+.discovery-disclaimer{font-size:10px;color:#839087}
+.discovery-section-label{margin:24px 0 19px}.discovery-section-label h2{font:800 clamp(23px,3vw,32px) Manrope,sans-serif;letter-spacing:-.7px;margin:6px 0}.discovery-section-label p{margin:0;color:#78877b;font-size:13px}
+.discovery-modes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:33px}
+.discovery-mode{background:white;border:1px solid #e4e9e1;border-radius:15px;min-height:148px;padding:18px;text-align:left;display:flex;flex-direction:column;gap:9px;transition:transform .18s,border .18s,background .18s}
+.discovery-mode:hover{transform:translateY(-3px)}.discovery-mode.selected{background:#273d35;color:white;border-color:#273d35}
+.discovery-mode .disc-symbol{font-size:27px;color:#c97858}.discovery-mode.selected .disc-symbol{color:#e1b9a5}
+.discovery-mode strong{font-size:17px;font-weight:800}.discovery-mode small{font-size:11px;color:#89958c}.discovery-mode.selected small{color:#c6d5ca}
+.discovery-section-heading{margin:34px 0 2px}.discovery-section-heading h2{margin:6px 0;font-size:20px}
+.discovery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px;margin-bottom:30px}
+.discovery-card{background:#fff;border:1px solid #e9ebe4;border-radius:15px;overflow:hidden;text-align:left;display:grid;grid-template-columns:45% 55%;min-height:185px}
+.discovery-photo{overflow:hidden;display:block;min-height:185px;background:#cad7c9}.discovery-photo img{width:100%;height:100%;object-fit:cover;transition:transform .3s}.discovery-card:hover img{transform:scale(1.06)}
+.discovery-copy{padding:20px;display:flex;flex-direction:column;gap:13px;justify-content:center;min-width:0}
+.discovery-copy small{font-size:10px;color:#a46e56;letter-spacing:1px;font-weight:800}
+.discovery-copy strong{font:800 clamp(16px,1.6vw,22px)/1.22 Manrope,sans-serif;color:#263c30}
+.discovery-open{font-size:12px;color:#587362;font-weight:700}
+.discovery-split{background:#e8ebe1;border-radius:18px;padding:clamp(22px,4vw,44px);display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center;margin:32px 0 40px}
+.discovery-split h2{font:800 28px Manrope,sans-serif;letter-spacing:-1px;margin:10px 0}.discovery-split p{font-size:13px;line-height:1.7;color:#677468}.discovery-city-shortcuts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.discovery-city-shortcuts button{background:#fff;border-radius:10px;padding:20px;text-align:left;display:flex;justify-content:space-between;font-weight:800}
+.discovery-explore-intro{padding:10px 0 24px}.discovery-explore-intro h2{font:800 clamp(26px,3vw,38px) Manrope,sans-serif;letter-spacing:-1.3px;margin:10px 0}.discovery-explore-intro p{font-size:13px;color:#718075;line-height:1.65}
+.discovery-guide-dialog{max-width:720px!important;overflow:auto;max-height:90dvh}.discovery-guide-hero{width:100%;max-height:350px;object-fit:cover}
+.discovery-guide-content{padding:25px 32px 36px}.discovery-guide-content h2{font:800 30px Manrope,sans-serif;letter-spacing:-1px}.discovery-guide-content p{line-height:1.9;color:#526158;font-size:14px}
+@media(max-width:950px){.discovery-grid{grid-template-columns:1fr 1fr}.discovery-card{grid-template-columns:1fr}.discovery-photo{height:175px;min-height:175px}}
+@media(max-width:640px){.discovery-hero{grid-template-columns:1fr}.discovery-hero-copy{padding:28px 23px}.discovery-hero-photo{min-height:180px;max-height:210px;grid-row:1}.discovery-hero h2{font-size:32px}.discovery-modes{gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}.discovery-mode{min-height:115px;padding:14px;gap:5px}.discovery-mode strong{font-size:15px}.discovery-grid{gap:11px}.discovery-photo{height:145px;min-height:145px}.discovery-copy{padding:13px;gap:8px}.discovery-copy strong{font-size:14px}.discovery-copy small{font-size:9px}.discovery-split{grid-template-columns:1fr}.discovery-guide-content{padding:20px}.discovery-guide-content h2{font-size:25px}}
+@media(prefers-reduced-motion:reduce){.discovery-card img,.discovery-mode{transition:none}.discovery-mode:hover{transform:none}}
+
+/* Brand wordmark — fit HeriLand on both desktop and narrow phones. */
+.logo{font-size:26px;letter-spacing:-1.6px}.mobile-top .logo{font-size:25px}.boot{font-size:clamp(30px,7vw,42px)}
